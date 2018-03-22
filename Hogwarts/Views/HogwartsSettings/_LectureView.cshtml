@@ -1,0 +1,21 @@
+﻿@{
+    var lecture = ViewBag.Lecture as Hogwarts.Models.Lecture;
+    var subLectures = ViewBag.SubLectures as IEnumerable<Hogwarts.Models.SubLecture>;
+}
+
+<div class="accordion" id="acdLecture_@(lecture.Id)">
+    <h3 id="lectureName_@(lecture.Id)">
+        @lecture.LectureName
+    </h3>
+    <div>
+        <input type="button" class="btn-xs Addbtn AddSubLecture" data-lectureId="@(lecture.Id)" value="講義内容追加" />
+        <input type="button" class="btn-xs Updatebtn UpdateLectureName" data-lectureId="@(lecture.Id)" value="講義名修正" />
+        <input type="button" class="btn-xs Deletebtn DeleteLecture" data-lectureId="@(lecture.Id)" value="講義削除" />
+        <div id="divSubLecture_@(lecture.Id)">
+            @foreach (var subLecture in subLectures)
+            {
+                @Html.Action("SubLectureView", new { subLectureId = subLecture.Id })
+            }
+        </div>
+    </div>
+</div>

@@ -23,11 +23,6 @@
             }
             ]
         </dd>
-        <dt>外部ログイン:</dt>
-        <dd>
-            @Model.Logins.Count [
-            @Html.ActionLink("管理", "ManageLogins") ]
-        </dd>
         @*
             2 要素認証システムでの検証の 2 番目の要素として、電話番号を使用できます。
              
@@ -56,12 +51,6 @@
                 }
             </dd>
         *@
-        <dt>2 要素認証:</dt>
-        <dd>
-            <p>
-                2 要素認証プロバイダーが構成されていません。2 要素認証をサポートするように、この ASP.NET アプリケーションを
-                設定する方法の詳細については、<a href="https://go.microsoft.com/fwlink/?LinkId=403804">この資料</a>を参照してください。
-            </p>
             @*@if (Model.TwoFactor)
                 {
                     using (Html.BeginForm("DisableTwoFactorAuthentication", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -82,6 +71,5 @@
                         </text>
                     }
                 }*@
-        </dd>
     </dl>
 </div>

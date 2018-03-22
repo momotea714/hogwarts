@@ -1,0 +1,23 @@
+﻿@{
+    var question = ViewBag.Question as Hogwarts.Models.Question;
+}
+
+<tr id="trQuestion_@(question.Id)">
+    <td>
+        @question.QuestionNO
+    </td>
+    <td>
+        <input type="text" id="QuestionName_@(question.Id)" value="@(question.QuestionName)" />
+    </td>
+    <td>
+        <input type="text" id="Difficulty_@(question.Id)" class="rating" value="@(question.Difficulty)" data-size="xs" title="" data-show-clear="false" data-show-caption="false" data-step="1">
+    </td>
+    <td>
+        <input type="number" id="EstimateTime_@(question.Id)" value="@(question.EstimateTime)" min="1" max="10000" />
+    </td>
+    <td>
+        <input type="button" class="btn-xs UpdateQuestionbtn" data-questionId="@(question.Id)" value="更新" />
+        <input type="button" class="btn-xs Deletebtn DeleteQuestion" data-questionId="@(question.Id)" value="削除" />
+        <span id="UpdateFinished_@(question.Id)" class="glyphicon glyphicon-ok-sign" style="display:none"></span>
+    </td>
+</tr>

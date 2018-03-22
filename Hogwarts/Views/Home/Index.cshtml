@@ -3,29 +3,65 @@
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>Hogwarts</h1>
+    <p class="lead">
+        This site is for New training.
+        Please use this site, taking advantage of the growth.
+    </p>
+    <p>
+        @if (!User.Identity.IsAuthenticated)
+        {
+            @Html.ActionLink("ログイン ≫", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "btn btn-ghost btn-white btn-lg" })
+        }
+    </p>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+<div>
+    <div class="row">
+        <div class="col-md-4">
+            <h2><a href="@Url.Action("Index","Information")">お知らせ</a></h2>
+            <p>
+                講師やスタッフからのお知らせを見ることができます。<br>
+                新人から新人にお知らせすることもできます。
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2><a href="@Url.Action("Index","Knowledge")">知識共有</a></h2>
+            <p>
+                学んだことをここで共有することができます。<br>
+                知識を集約していき、皆の学習に役立てます。
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2><a href="@Url.Action("Index","Asks")">質問</a></h2>
+            <p>
+                講師やスタッフに質問することができます。<br>
+                質問する前に一度ここで同じ質問がないか確認してみましょう。
+            </p>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="row">
+        <div class="col-md-4">
+            <h2><a href="@Url.Action("Index","Group")">グループ管理</a></h2>
+            <p>
+                グループを登録し、グループごとの進捗を管理します。
+                グループの評価は最終的に個人の評価に影響します。
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h2><a href="@Url.Action("Index","Lectures")">進捗管理</a></h2>
+            <p>
+                演習問題等の進捗管理をすることができます。<br>
+                ここで管理される進捗は評価の一要素となります。
+            </p>
+        </div>
+        <div class="col-md-4">
+
+            <h2><a href="@Url.Action("Index","Records")">ランキング</a></h2>
+            <p>
+                リアルタイムでランキングを表示します。<br>
+                各講義の最終日は新人は見ることができません。
+            </p>
+        </div>
     </div>
 </div>

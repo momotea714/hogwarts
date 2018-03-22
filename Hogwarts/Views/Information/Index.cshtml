@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Hogwarts.Models.Information>
+
+@{
+    var informationFromNews = ViewBag.InformationFromNews as IEnumerable<Hogwarts.Models.Information>;
+    var informationFromManagers = ViewBag.InformationFromManagers as IEnumerable<Hogwarts.Models.Information>;
+}
+<br>
+<div class="row" style="height:100%; ">
+    <div class="col-md-6" style="overflow-y:auto;">
+        <p>
+            講師陣よりお知らせ
+            @if (User.IsInRole("Admin"))
+            {
+                @Html.ActionLink("Create New", "Create")
+            }
+        </p>
+        <table class="table table-bordered">
+            @foreach (var item in informationFromManagers)
+            {
+                <tr>
+                    <td>
+                        <h3>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </h3>
+                        <small>
+                            作成者：@Html.DisplayFor(modelItem => item.CreateUserName)
+                            作成日時：@Html.DisplayFor(modelItem => item.CreateDateTime)
+                            更新日時：@Html.DisplayFor(modelItem => item.UpdateDateTime)
+                            @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        </small>
+                        <p>
+                            @Html.DisplayFor(modelItem => item.Content)
+                        </p>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="col-md-6" style="overflow-y:auto;">
+        <p>
+            新人間のお知らせ
+            @if (!User.IsInRole("Admin"))
+            {
+                @Html.ActionLink("Create New", "Create")
+            }
+        </p>
+        <table class="table table-bordered">
+            @foreach (var item in informationFromNews)
+            {
+                <tr>
+                    <td>
+                        <h3>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </h3>
+                        <small>
+                            作成者：@Html.DisplayFor(modelItem => item.CreateUserName)
+                            作成日時：@Html.DisplayFor(modelItem => item.CreateDateTime)
+                            更新日時：@Html.DisplayFor(modelItem => item.UpdateDateTime)
+                            @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        </small>
+                        <p>
+                            @Html.DisplayFor(modelItem => item.Content)
+                        </p>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Hogwarts.Models.Knowledge>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Launch demo modal
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("Create", new Hogwarts.Models.Knowledge())
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.IncludeCategoryName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsPublic)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreateUserId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreateDateTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UpdateDateTime)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.IncludeCategoryName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsPublic)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreateUserId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreateDateTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UpdateDateTime)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,127 @@
+﻿@model IEnumerable<Hogwarts.Models.HogwartsSetting>
+
+@{
+    @Styles.Render("~/Content/bootstrap_select")
+    @Scripts.Render("~/bundles/bootstrap_select")
+
+    var roles = ViewBag.Roles as IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>;
+    var nowDisplayRole = ViewBag.NowDisplayRole as string;
+}
+
+<style>
+    body {
+        font-family: Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    }
+
+    .accordion-expand-holder .open, .accordion-expand-holder .close {
+        margin: 0 10px 0 0;
+    }
+
+    .ui-accordion-content {
+        height: auto;
+    }
+
+    #loader-bg {
+        display: none;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        background: #000;
+        z-index: 1;
+    }
+
+    #loader {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 200px;
+        height: 200px;
+        margin-top: -100px;
+        margin-left: -100px;
+        text-align: center;
+        color: #fff;
+        z-index: 2;
+    }
+</style>
+
+<div id="loader-bg">
+    <div id="loader">
+        <img src="~/Images/img-loading.gif" width="80" height="80" alt="Now Loading..." />
+        <p>Now Loading...</p>
+    </div>
+</div>
+<div id="wrap">
+    <h2>
+        <label for="selRole" class="label">表示グループ設定</label>
+        <select id="selRole" name="selRole" class="selectpicker" title="今期は？">
+            @foreach (var role in roles)
+            {
+                if (role.Name == nowDisplayRole)
+                {
+                    <option value="@(role.Id)" selected>@(role.Name)</option>
+                }
+                else
+                {
+                    <option value="@(role.Id)">@(role.Name)</option>
+                }
+            }
+        </select>
+    </h2>
+    <div id="show_dialog">
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#LectureSetting">講義設定</a></li>
+        <li><a data-toggle="tab" href="#UserSetting">社員設定</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <br>
+        <div id="LectureSetting" class="tab-pane fade in active">
+            @Html.Action("LectureSettingView")
+        </div>
+        <div id="UserSetting" class="tab-pane fade">
+            @Html.Action("RegistUserView")
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('.selectpicker').selectpicker();
+
+        //on change function i need to control selected value
+        $('select.selectpicker').on('change', function () {
+            var selected = $('.selectpicker option:selected').val();
+
+            var ajaxData =
+            {
+                    Id: selected //1:Lecture,2:SubLecture,3:Question
+                };
+
+            var h = $(window).height();
+            $('#wrap').css('display', 'none');
+            $('#loader-bg ,#loader').height(h).css('display', 'block');
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ChangeNowDisplayRole", "HogwartsSettings")',
+            data: ajaxData,
+            dataType: "json"
+        }).done(function (response, textStatus, jqXHR) {
+            if (response.result == 'Redirect') {
+                window.location = response.url;
+            }
+            else {
+                alert('更新失敗F5してからもう一度お願いします');
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+        });
+    });
+</script>

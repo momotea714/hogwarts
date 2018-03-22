@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Hogwarts.Models.UserAnswerState>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.QuestionId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UserId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.State)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Remark)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UpdateDateTime)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.QuestionId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.State)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Remark)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UpdateDateTime)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

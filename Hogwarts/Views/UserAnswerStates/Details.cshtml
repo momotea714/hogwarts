@@ -1,0 +1,58 @@
+﻿@model Hogwarts.Models.UserAnswerState
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>UserAnswerState</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.QuestionId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.QuestionId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.State)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.State)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Remark)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Remark)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateDateTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UpdateDateTime)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -38,6 +38,11 @@ namespace Hogwarts
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
         {
+            UserValidator = new UserValidator<ApplicationUser>(this)
+            {
+                AllowOnlyAlphanumericUserNames = false,
+                RequireUniqueEmail = true,
+            };
         }
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 

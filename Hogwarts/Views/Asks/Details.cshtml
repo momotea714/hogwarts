@@ -1,0 +1,66 @@
+﻿@model Hogwarts.Models.Ask
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Ask</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ParentAskId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ParentAskId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Content)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateUserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateUserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsClosed)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsClosed)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDateTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateDateTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateDateTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UpdateDateTime)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

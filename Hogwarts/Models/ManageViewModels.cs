@@ -9,7 +9,6 @@ namespace Hogwarts.Models
     {
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
-        public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }
         public bool BrowserRemembered { get; set; }
     }
@@ -56,26 +55,6 @@ namespace Hogwarts.Models
         [Display(Name = "新しいパスワードの確認入力")]
         [Compare("NewPassword", ErrorMessage = "新しいパスワードと確認のパスワードが一致しません。")]
         public string ConfirmPassword { get; set; }
-    }
-
-    public class AddPhoneNumberViewModel
-    {
-        [Required]
-        [Phone]
-        [Display(Name = "電話番号")]
-        public string Number { get; set; }
-    }
-
-    public class VerifyPhoneNumberViewModel
-    {
-        [Required]
-        [Display(Name = "コード")]
-        public string Code { get; set; }
-
-        [Required]
-        [Phone]
-        [Display(Name = "電話番号")]
-        public string PhoneNumber { get; set; }
     }
 
     public class ConfigureTwoFactorViewModel

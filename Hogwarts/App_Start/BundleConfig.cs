@@ -21,11 +21,46 @@ namespace Hogwarts
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js",
+                      "~/Scripts/bootstrap-table-expandable.js",
                       "~/Scripts/respond.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap_select").Include(
+                      "~/Scripts/bootstrap-select.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jstree").Include(
+                      "~/Scripts/jstree.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/accordion").Include(
+                      "~/Scripts/jquery.accordion.js",
+                      "~/Scripts/jquery.easing.1.3.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
+                      "~/Scripts/jquery-ui.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/star-rating").Include(
+                      "~/Scripts/star-rating.min.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/bootstrap-table-expandable.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new StyleBundle("~/Content/bootstrap_select").Include(
+                      "~/Content/bootstrap-select.min.css"));
+
+            bundles.Add(new StyleBundle("~/Content/jstree").Include(
+                      "~/Content/jstree/style.min.css"));
+
+            bundles.Add(new StyleBundle("~/Content/star-rating").Include(
+                      "~/Content/star-rating.min.css"));
+
+            bundles.Add(new StyleBundle("~/Content/accordion").Include(
+                      "~/Content/jstree/FlexibleSlideToTopAccordion.css"));
+
+            bundles.Add(new StyleBundle("~/Content/jqueryui").Include(
+                      "~/Content/jquery-ui.min.css",
+                      "~/Content/jquery-ui.theme.min.css",
+                      "~/Content/jquery-ui.structure.min.css"));
         }
     }
 }

@@ -1,0 +1,154 @@
+﻿@{
+    @Styles.Render("~/Content/accordion")
+    @Styles.Render("~/Content/jqueryui")
+    @Scripts.Render("~/bundles/star-rating")
+    @Scripts.Render("~/bundles/accordion")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Styles.Render("~/Content/star-rating")
+    var lectures = ViewBag.Lectures as IEnumerable<Hogwarts.Models.Lecture>;
+    var subLectures = ViewBag.SubLectures as IEnumerable<Hogwarts.Models.SubLecture>;
+    var questions = ViewBag.Questions as IEnumerable<Hogwarts.Models.Question>;
+}
+
+<style>
+    body {
+        font-family: Arial, Tahoma, Verdana, Helvetica, sans-serif;
+    }
+
+    .accordion-expand-holder .open, .accordion-expand-holder .close {
+        margin: 0 10px 0 0;
+    }
+
+    .ui-accordion-content {
+        height: auto;
+    }
+
+    /*#custom-handle {
+        width: 3em;
+        height: 1.6em;
+        margin-top: -.8em;
+        text-align: center;
+        line-height: 1.6em;
+    }*/
+</style>
+@foreach (var lecture in lectures)
+{
+    <div class="accordion">
+        <h3>
+            @lecture.LectureName
+        </h3>
+        <div>
+            @foreach (var subLecture in subLectures.Where(x => x.LectureId == lecture.Id))
+            {
+                <div class="accordion">
+                    <h3>
+                        @subLecture.SubLectureName
+                    </h3>
+                    <div>
+                        <table class="table table-hover table-striped">
+                            <tr>
+                                <th width="10%">
+                                    問題
+                                </th>
+                                <th width="20%">
+                                    難易度
+                                </th>
+                                <th width="20%">
+                                    進捗
+                                </th>
+                                <th width="20%">
+                                    理解度
+                                </th>
+                                <th width="50%">
+                                    備考
+                                </th>
+                            </tr>
+                            <tbody>
+                                @foreach (var question in questions.Where(x => x.SubLectureId == subLecture.Id))
+                                {
+
+                                    <tr>
+                                        <td>
+                                            @question.QuestionName
+                                        </td>
+                                        <td>
+                                            <input type="text" class="rating" value="@question.Difficulty" data-size="xs" title="" data-readonly="true" data-show-clear="false" data-show-caption="false">
+                                        </td>
+                                        <td>
+                                            <div id="sldProgress_question_@(question.Id.ToString())" class="slider_progress">
+                                                <div class="ui-slider-handle"></div>
+                                            </div>
+                                            <label id="lblProgress_question_@(question.Id.ToString())"></label>
+                                        </td>
+                                        <td>
+                                            <div id="sldUnderStand_question_@(question.Id.ToString())" class="slider_understand">
+                                                <div class="ui-slider-handle"></div>
+                                            </div>
+                                            <label id="lblUnderStand_question_@(question.Id.ToString())"></label>
+                                        </td>
+                                        <td>
+                                            <textarea rows="2" cols="30"></textarea>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        var icons = {
+            header: "ui-icon-circle-arrow-e",
+            activeHeader: "ui-icon-circle-arrow-s"
+        };
+        $(".accordion").accordion({
+            collapsible: true,
+            active: false,
+            heightStyle: "content",
+            icons: icons,
+        });
+
+        //var handle = $("#custom-handle");
+        //$("#slider").slider({
+        //    create: function () {
+        //        handle.text($(this).slider("value"));
+        //    },
+        //    slide: function (event, ui) {
+        //        handle.text(ui.value);
+        //    }
+        //});
+
+        var slider_progress = $(".slider_progress");
+        var slider_understand = $(".slider_understand");
+        slider_progress.each(function () {
+            SetSlider($(this));
+        });
+
+        slider_understand.each(function () {
+            SetSlider($(this));
+        });
+
+        function SetSlider(sliderObj) {
+            sliderObj.empty().slider({
+                value: 0,
+                min: 0,
+                max: 100,
+                range: "max",
+                step: 10,
+                animate: 100,
+                slide: function (event, ui) {
+                    sliderObj.siblings().text(ui.value);
+                    var id = sliderObj[0].id.replace("sld", "lbl");
+                    $('#' + id).text(ui.value.toString() + "%")
+                }
+            });
+        }
+
+
+    });
+</script>

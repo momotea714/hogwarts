@@ -3,11 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hogwarts.Models
 {
+    // Add-Migration Initial
+    //Update-Database
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
-        [Display(Name = "電子メール")]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
     }
 
     public class ExternalLoginListViewModel
@@ -42,16 +44,15 @@ namespace Hogwarts.Models
     public class ForgotViewModel
     {
         [Required]
-        [Display(Name = "電子メール")]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
     }
 
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "電子メール")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -65,9 +66,8 @@ namespace Hogwarts.Models
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress]
-        [Display(Name = "電子メール")]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "{0} の長さは {2} 文字以上である必要があります。", MinimumLength = 6)]
@@ -84,9 +84,8 @@ namespace Hogwarts.Models
     public class ResetPasswordViewModel
     {
         [Required]
-        [EmailAddress]
-        [Display(Name = "電子メール")]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "{0} の長さは {2} 文字以上である必要があります。", MinimumLength = 6)]
@@ -105,8 +104,7 @@ namespace Hogwarts.Models
     public class ForgotPasswordViewModel
     {
         [Required]
-        [EmailAddress]
-        [Display(Name = "電子メール")]
-        public string Email { get; set; }
+        [Display(Name = "社員番号")]
+        public string UserID { get; set; }
     }
 }

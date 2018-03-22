@@ -59,15 +59,12 @@ namespace Hogwarts.Controllers
                 : message == ManageMessageId.SetPasswordSuccess ? "パスワードが設定されました。"
                 : message == ManageMessageId.SetTwoFactorSuccess ? "2 要素認証プロバイダーが設定されました。"
                 : message == ManageMessageId.Error ? "エラーが発生しました。"
-                : message == ManageMessageId.AddPhoneSuccess ? "電話番号が追加されました。"
-                : message == ManageMessageId.RemovePhoneSuccess ? "電話番号が削除されました。"
                 : "";
 
             var userId = User.Identity.GetUserId();
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
@@ -106,29 +103,6 @@ namespace Hogwarts.Controllers
             return View();
         }
 
-        //
-        // POST: /Manage/AddPhoneNumber
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddPhoneNumber(AddPhoneNumberViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            // トークンを生成して送信します。
-            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), model.Number);
-            if (UserManager.SmsService != null)
-            {
-                var message = new IdentityMessage
-                {
-                    Destination = model.Number,
-                    Body = "あなたのセキュリティ コード: " + code
-                };
-                await UserManager.SmsService.SendAsync(message);
-            }
-            return RedirectToAction("VerifyPhoneNumber", new { PhoneNumber = model.Number });
-        }
 
         //
         // POST: /Manage/EnableTwoFactorAuthentication
@@ -158,40 +132,6 @@ namespace Hogwarts.Controllers
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
             return RedirectToAction("Index", "Manage");
-        }
-
-        //
-        // GET: /Manage/VerifyPhoneNumber
-        public async Task<ActionResult> VerifyPhoneNumber(string phoneNumber)
-        {
-            var code = await UserManager.GenerateChangePhoneNumberTokenAsync(User.Identity.GetUserId(), phoneNumber);
-            // 電話番号を確認するために SMS プロバイダー経由で SMS を送信します。
-            return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
-        }
-
-        //
-        // POST: /Manage/VerifyPhoneNumber
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var result = await UserManager.ChangePhoneNumberAsync(User.Identity.GetUserId(), model.PhoneNumber, model.Code);
-            if (result.Succeeded)
-            {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                if (user != null)
-                {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                }
-                return RedirectToAction("Index", new { Message = ManageMessageId.AddPhoneSuccess });
-            }
-            // ここに到達した場合は何らかの問題が発生しているので、フォームを再表示します。
-            ModelState.AddModelError("", "電話番号を確認できませんでした");
-            return View(model);
         }
 
         //

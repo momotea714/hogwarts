@@ -75,7 +75,7 @@ namespace Hogwarts.Controllers
 
             // これは、アカウント ロックアウトの基準となるログイン失敗回数を数えません。
             // パスワード入力失敗回数に基づいてアカウントがロックアウトされるように設定するには、shouldLockout: true に変更してください。
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserID, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -151,7 +151,7 @@ namespace Hogwarts.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserID, UserID = model.UserID ,Email="test@test.com"};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -159,9 +159,9 @@ namespace Hogwarts.Controllers
                     
                     // アカウント確認とパスワード リセットを有効にする方法の詳細については、https://go.microsoft.com/fwlink/?LinkID=320771 を参照してください
                     // このリンクを含む電子メールを送信します
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "アカウントの確認", "このリンクをクリックすることによってアカウントを確認してください <a href=\"" + callbackUrl + "\">こちら</a>");
+                    // string code = await UserManager.GenerateUserIDConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmUserID", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendUserIDAsync(user.Id, "アカウントの確認", "このリンクをクリックすることによってアカウントを確認してください <a href=\"" + callbackUrl + "\">こちら</a>");
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -173,17 +173,17 @@ namespace Hogwarts.Controllers
         }
 
         //
-        // GET: /Account/ConfirmEmail
-        [AllowAnonymous]
-        public async Task<ActionResult> ConfirmEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                return View("Error");
-            }
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
-        }
+        // GET: /Account/ConfirmUserID
+        //[AllowAnonymous]
+        //public async Task<ActionResult> ConfirmUserID(string userId, string code)
+        //{
+        //    if (userId == null || code == null)
+        //    {
+        //        return View("Error");
+        //    }
+        //    var result = await UserManager.ConfirmUserIDAsync(userId, code);
+        //    return View(result.Succeeded ? "ConfirmUserID" : "Error");
+        //}
 
         //
         // GET: /Account/ForgotPassword
@@ -195,31 +195,31 @@ namespace Hogwarts.Controllers
 
         //
         // POST: /Account/ForgotPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
-                {
-                    // ユーザーが存在しないことや未確認であることを公開しません。
-                    return View("ForgotPasswordConfirmation");
-                }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await UserManager.FindByNameAsync(model.UserID);
+        //        if (user == null || !(await UserManager.IsUserIDConfirmedAsync(user.Id)))
+        //        {
+        //            // ユーザーが存在しないことや未確認であることを公開しません。
+        //            return View("ForgotPasswordConfirmation");
+        //        }
 
-                // アカウント確認とパスワード リセットを有効にする方法の詳細については、https://go.microsoft.com/fwlink/?LinkID=320771 を参照してください
-                // このリンクを含む電子メールを送信します
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "パスワード", "のリセット <a href=\"" + callbackUrl + "\">こちら</a> をクリックして、パスワードをリセットしてください");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
-            }
+        //        // アカウント確認とパスワード リセットを有効にする方法の詳細については、https://go.microsoft.com/fwlink/?LinkID=320771 を参照してください
+        //        // このリンクを含む電子メールを送信します
+        //        // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+        //        // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
+        //        // await UserManager.SendUserIDAsync(user.Id, "パスワード", "のリセット <a href=\"" + callbackUrl + "\">こちら</a> をクリックして、パスワードをリセットしてください");
+        //        // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+        //    }
 
-            // ここで問題が発生した場合はフォームを再表示します
-            return View(model);
-        }
+        //    // ここで問題が発生した場合はフォームを再表示します
+        //    return View(model);
+        //}
 
         //
         // GET: /Account/ForgotPasswordConfirmation
@@ -248,7 +248,7 @@ namespace Hogwarts.Controllers
             {
                 return View(model);
             }
-            var user = await UserManager.FindByNameAsync(model.Email);
+            var user = await UserManager.FindByNameAsync(model.UserID);
             if (user == null)
             {
                 // ユーザーが存在しないことを公開しません。
@@ -319,33 +319,33 @@ namespace Hogwarts.Controllers
 
         //
         // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Login");
-            }
+        //[AllowAnonymous]
+        //public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+        //{
+        //    var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
+        //    if (loginInfo == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
 
-            // ユーザーが既にログインを持っている場合、この外部ログイン プロバイダーを使用してユーザーをサインインします
-            var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
-                case SignInStatus.Failure:
-                default:
-                    // ユーザーがアカウントを持っていない場合、ユーザーにアカウントを作成するよう求めます
-                    ViewBag.ReturnUrl = returnUrl;
-                    ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
-            }
-        }
+        //    // ユーザーが既にログインを持っている場合、この外部ログイン プロバイダーを使用してユーザーをサインインします
+        //    var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
+        //    switch (result)
+        //    {
+        //        case SignInStatus.Success:
+        //            return RedirectToLocal(returnUrl);
+        //        case SignInStatus.LockedOut:
+        //            return View("Lockout");
+        //        case SignInStatus.RequiresVerification:
+        //            return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
+        //        case SignInStatus.Failure:
+        //        default:
+        //            // ユーザーがアカウントを持っていない場合、ユーザーにアカウントを作成するよう求めます
+        //            ViewBag.ReturnUrl = returnUrl;
+        //            ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
+        //            return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserID = loginInfo.UserID });
+        //    }
+        //}
 
         //
         // POST: /Account/ExternalLoginConfirmation
@@ -367,7 +367,7 @@ namespace Hogwarts.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserID, UserID = model.UserID };
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {

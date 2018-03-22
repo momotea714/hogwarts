@@ -1,0 +1,77 @@
+﻿@{
+    @Styles.Render("~/Content/bootstrap_select")
+    @Scripts.Render("~/bundles/bootstrap_select")
+
+    var lectures = ViewBag.Lectures as IEnumerable<Hogwarts.Models.Lecture>;
+    var users = ViewBag.Users as IEnumerable<Hogwarts.Models.ApplicationUser>;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <textarea id="txtUserInfo" class="form-control" rows="10" placeholder="社員番号    社員名"></textarea>
+        <input type="button" class="btn" id="btnRegistUser" value="一括登録" />
+        ※初期パスワードはムズパス
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered">
+            <tr>
+                <th width="10%">
+                    ID
+                </th>
+                <th width="10%">
+                    名前
+                </th>
+            </tr>
+            <tbody>
+                @foreach (var user in users.OrderBy(x => x.UserID))
+                {
+                    <tr>
+                        <td>
+                            @user.UserID
+                        </td>
+                        <td>
+                            @user.DisplayUserName
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+$(function () {
+    $("#btnRegistUser").on('click', function (event) {
+        RegistUser();
+    });
+
+    function RegistUser() {
+        var text = $('#txtUserInfo').val();
+
+        if (text === '') {
+            return;
+        }
+        var ajaxData =
+            {
+                text: text
+            };
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("RegistUser", "HogwartsSettings")',
+            data: ajaxData,
+            dataType: "json"
+        }).done(function (response, textStatus, jqXHR) {
+            if (response.Result) {
+                alert('完了:' + response.ResultData);
+            }
+            else {
+                alert(response.Message);
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    }
+});
+</script>

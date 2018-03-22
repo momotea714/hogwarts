@@ -1,0 +1,355 @@
+﻿@{
+    @Styles.Render("~/Content/star-rating")
+    @Styles.Render("~/Content/jqueryui")
+    @Styles.Render("~/Content/accordion")
+    @Scripts.Render("~/bundles/accordion")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/star-rating")
+
+    var lectures = ViewBag.Lectures as IEnumerable<Hogwarts.Models.Lecture>;
+}
+<div id="LectureSetting">
+    <input type="button" class="btn-ghost Addbtn AddLecture" value="講義追加" />
+    <div id="divLecture">
+        @foreach (var lecture in lectures)
+        {
+            @Html.Action("LectureView", new { lectureId = lecture.Id })
+        }
+    </div>
+</div>
+<script type="text/javascript">
+$(function () {
+
+    function SetAccordion(obj) {
+        var icons = {
+            header: "ui-icon-circle-arrow-e",
+            activeHeader: "ui-icon-circle-arrow-s"
+        };
+        if (obj === null) {
+            $(".accordion").accordion({
+                collapsible: true,
+                active: false,
+                heightStyle: "content",
+                icons: icons,
+            });
+        }
+        else {
+            obj.accordion({
+                collapsible: true,
+                active: false,
+                heightStyle: "content",
+                icons: icons,
+            });
+        }
+
+    }
+
+    SetAccordion(null);
+
+    $("#LectureSetting").on('click', ".Addbtn", function (event) {
+        ShowAddDialog(this);
+    });
+
+    $("#LectureSetting").on('click', ".Updatebtn", function (event) {
+        ShowUpdateDialog(this);
+    });
+
+    $("#LectureSetting").on('click', ".UpdateQuestionbtn", function (event) {
+        var name = $('#QuestionName_' + $(this).attr("data-questionId")).val();
+        UpdateObject(this, name);
+    });
+
+    $("#LectureSetting").on('click', ".Deletebtn", function (event) {
+        if (confirm("本当に削除しますか？")) {
+            DeleteObject(this);
+        }
+    });
+
+    function AddObject(btn,name) {
+        var addNodeCategoryCD = 0;
+        var parentId = null;
+        if ($(btn).hasClass('AddLecture')) {
+            addNodeCategoryCD = 1;
+            parentId = 0;
+        }
+        else if ($(btn).hasClass('AddSubLecture')) {
+            addNodeCategoryCD = 2;
+            parentId = $(btn).attr("data-lectureId");
+        }
+        else if ($(btn).hasClass('AddQuestion')) {
+            addNodeCategoryCD = 3;
+            parentId = $(btn).attr("data-subLectureId");
+        }
+        else {
+            alert('追加に失敗しました。');
+            return;
+        }
+        if ((name === '' || name === null || typeof (name) == 'undefined')) {
+            return false;
+        }
+        var ajaxData =
+            {
+                NodeCategoryCD: addNodeCategoryCD //1:Lecture,2:SubLecture,3:Question
+                , ParentId: parentId
+                ,Text:name
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddTreeObject", "HogwartsSettings")',
+                    data: ajaxData,
+                    dataType: "json"
+                }).done(function (response, textStatus, jqXHR) {
+                    if (response.Result) {
+                        if (response.Message != null && response.Message != '') {
+                            alert(response.Message);
+                            return;
+                        }
+                        GetPartialView(response.ResultData.NodeCategoryCD
+                            , response.ResultData.Data.Id
+                            , ajaxData.ParentId);
+                    }
+                    else {
+                        alert(response.Message);
+                    }
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }).always(function (jqXHR, textStatus) {
+                });
+    };
+
+    function UpdateObject(btn,name) {
+        var nodeCategoryCD = null;
+
+        if ($(btn).hasClass('UpdateLectureName')) {
+            id = $(btn).attr("data-lectureId");
+            nodeCategoryCD = 1;
+        }
+        else if ($(btn).hasClass('UpdateSubLectureName')) {
+            id = $(btn).attr("data-subLectureId");
+            nodeCategoryCD = 2;
+        }
+        else if ($(btn).hasClass('UpdateQuestionbtn')) {
+            id = $(btn).attr("data-questionId");
+            nodeCategoryCD = 3;
+        }
+        else {
+            alert('追加に失敗しました。');
+            return;
+        }
+
+        var ajaxData =
+            {
+                NodeCategoryCD: nodeCategoryCD //1:Lecture,2:SubLecture,3:Question
+                , Id: id
+                , Text: name
+            };
+
+        if (nodeCategoryCD == 3) {
+            ajaxData.Difficulty = $('#Difficulty_' + id).val();
+            ajaxData.EstimateTime = $('#EstimateTime_' + id).val();
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditTreeObject", "HogwartsSettings")',
+            data: ajaxData,
+            dataType: "json"
+        }).done(function (response, textStatus, jqXHR) {
+
+            if (response.Result) {
+                if (response.Message != null && response.Message != '') {
+                    alert(response.Message);
+                    return;
+                }
+                $('#UpdateFinished_' + ajaxData.Id).show();
+            }
+            else {
+                alert(response.Message);
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    };
+
+    function DeleteObject(btn) {
+
+        var nodeCategoryCD = null;
+
+        if ($(btn).hasClass('DeleteLecture')) {
+            id = $(btn).attr("data-lectureId");
+            nodeCategoryCD = 1;
+        }
+        else if ($(btn).hasClass('DeleteSubLecture')) {
+            id = $(btn).attr("data-subLectureId");
+            nodeCategoryCD = 2;
+        }
+        else if ($(btn).hasClass('DeleteQuestion')) {
+            id = $(btn).attr("data-questionId");
+            nodeCategoryCD = 3;
+        }
+        else {
+            alert('削除に失敗しました。');
+            return;
+        }
+
+        var ajaxData =
+            {
+                NodeCategoryCD: nodeCategoryCD //1:Lecture,2:SubLecture,3:Question
+                , Id: id
+            };
+        $.ajax({
+            type: "POST",
+            /**/
+            url: '@Url.Action("DeleteTreeObject", "HogwartsSettings")',
+            /**/
+            data: ajaxData,
+            dataType: "json"
+        }).done(function (response, textStatus, jqXHR) {
+            if (response.Result) {
+                if (response.Message != null && response.Message != '') {
+                    alert(response.Message);
+                    return;
+                }
+                DeleteNode(response.ResultData);
+            }
+            else {
+                alert(response.Message);
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    };
+
+    function DeleteNode(data) {
+        if (data.NodeCategoryCD == 1) {
+            $("#acdLecture_" + data.Id.toString()).remove();
+        }
+        else if (data.NodeCategoryCD == 2) {
+            $("#acdSubLecture_" + data.Id.toString()).remove();
+        }
+        else if (data.NodeCategoryCD == 3) {
+            $("#trQuestion_" + data.Id.toString()).remove();
+        }
+    }
+
+    function GetPartialView(nodeCategoryCD,id,parentId) {
+
+        var ajaxData =
+            {
+                NodeCategoryCD: nodeCategoryCD //1:Lecture,2:SubLecture,3:Question
+                , Id: id
+            };
+        $.ajax({
+            type: "POST",
+            /**/
+            url: '@Url.Action("GetPartialView", "HogwartsSettings")',
+            /**/
+            data: ajaxData,
+            dataType: "html"
+        }).done(function (response, textStatus, jqXHR) {
+            if (ajaxData.NodeCategoryCD == 1) {
+                $('#divLecture').append(response);
+                SetAccordion($('#acdLecture_' + id.toString()));
+            }
+            else if (ajaxData.NodeCategoryCD == 2) {
+                $('#divSubLecture_' + parentId.toString()).append(response);
+                SetAccordion($('#acdSubLecture_' + id.toString()));
+            }
+            else if (ajaxData.NodeCategoryCD == 3) {
+                $('#tbody_' + parentId.toString()).append(response);
+                $("#Difficulty_" + id.toString()).rating();
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    }
+
+    function ShowAddDialog(btn) {
+        var strTitle = "";
+        var strComment = "";
+        var strInitialValue = "";
+        if ($(btn).hasClass('AddLecture')) {
+            strTitle = "講義を追加";
+            strComment = "追加する講義名を入力してください";
+            strInitialValue = '';
+        }
+        else if ($(btn).hasClass('AddSubLecture')) {
+            strTitle = "講義内容を追加";
+            strComment = "追加する講義内容名を入力してください";
+            strInitialValue = '';
+        }
+        else if ($(btn).hasClass('AddQuestion')) {
+            strTitle = "問題を追加";
+            strComment = "追加する問題のタイトルを入力してください";
+            strInitialValue = '';
+        }
+        else {
+            return;
+        }
+        // ダイアログのメッセージを設定
+        $("#show_dialog").html('<p>' + strComment + '</p><input type="text" name="inputtxt" id="inputtxt" value="' + strInitialValue + '" />');
+
+        // ダイアログを作成
+        $("#show_dialog").dialog({
+            modal: true,
+            title: strTitle,
+            buttons: {
+                Continue: function () {
+                    $(this).dialog("close");
+                    //ShowJQueryMessageDialog("入力された文字は「" + $("#inputtxt").val() + "」です。");
+                    AddObject(btn, $("#inputtxt").val());
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                    //ShowJQueryMessageDialog("キャンセルがクリックされました");
+                    return $("#inputtxt").val();
+                }
+            }
+        });
+    };
+
+    function ShowUpdateDialog(btn) {
+        var strTitle = "";
+        var strComment = "";
+        var strInitialValue = "";
+        if ($(btn).hasClass('UpdateLectureName')) {
+            strTitle = "講義名を修正";
+            strComment = "講義名を入力してください";
+            strInitialValue = '';
+        }
+        else if ($(btn).hasClass('UpdateSubLectureName')) {
+            strTitle = "講義内容を修正";
+            strComment = "講義内容名を入力してください";
+            strInitialValue = '';
+        }
+
+        if (strTitle == '') {
+            return;
+        }
+        // ダイアログのメッセージを設定
+        $("#show_dialog").html('<p>' + strComment + '</p><input type="text" name="inputtxt" id="inputtxt" value="' + strInitialValue + '" />');
+
+        // ダイアログを作成
+        $("#show_dialog").dialog({
+            modal: true,
+            title: strTitle,
+            buttons: {
+                Continue: function () {
+                    $(this).dialog("close");
+                    //ShowJQueryMessageDialog("入力された文字は「" + $("#inputtxt").val() + "」です。");
+                    UpdateObject(btn, $("#inputtxt").val());
+                },
+                Cancel: function () {
+                    $(this).dialog("close");
+                    //ShowJQueryMessageDialog("キャンセルがクリックされました");
+                    return $("#inputtxt").val();
+                }
+            }
+        });
+    };
+});
+</script>
