@@ -21,8 +21,11 @@ namespace Hogwarts.Controllers
         // GET: HogwartsSettings
         public ActionResult Index()
         {
+            var nowDisplayRole = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowDisplayRole);
             ViewBag.Roles = UserUtility.GetAllRoleExceptAdmin();
-            ViewBag.NowDisplayRole = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowDisplayRole);
+            ViewBag.LecturesForSelectBox = LectureUtility.GetLecturesInNowRole(nowDisplayRole);
+            ViewBag.NowDisplayRole = nowDisplayRole;
+            ViewBag.NowLecture = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowLecture);
 
             return View(db.HogwartsSettings.ToList());
         }
@@ -94,8 +97,7 @@ namespace Hogwarts.Controllers
         {
             var nowDisplayRole = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowDisplayRole);
 
-            ViewBag.Lectures = db.Lectures.Where(x => x.Role == nowDisplayRole)
-                                          .OrderBy(x => x.ShowOrder).ToList();
+            ViewBag.Lectures = LectureUtility.GetLecturesInNowRole(nowDisplayRole);
             return PartialView("_LectureSettingView");
         }
 
@@ -121,6 +123,20 @@ namespace Hogwarts.Controllers
             return PartialView("_QuestionView");
         }
 
+        public ActionResult TargetTraineeOfLectureView(int lectureId)
+        {
+            ViewBag.LectureId = lectureId;
+            ViewBag.AllTrainee = UserUtility.GetUserListInNowDisplayGroup();
+            ViewBag.TargetTraineeOfLectures = db.TargetTraineeOfLectures.Where(x => x.LectureId == lectureId).ToList();
+            return PartialView("_TargetTraineeOfLectureView");
+        }
+
+        public ActionResult RegistUserView()
+        {
+            ViewBag.Users = UserUtility.GetUserListInNowDisplayGroup();
+            return PartialView("_RegistUserView");
+        }
+
         public ActionResult GetPartialView(AjaxParam ajaxParam)
         {
             if (ajaxParam.NodeCategoryCD == 1)
@@ -140,12 +156,7 @@ namespace Hogwarts.Controllers
                 return null;
             }
         }
-
-        public ActionResult RegistUserView()
-        {
-            ViewBag.Users = UserUtility.GetUserListInNowDisplayGroup();
-            return PartialView("_RegistUserView");
-        }
+        
         #endregion
 
         #region API
@@ -169,6 +180,16 @@ namespace Hogwarts.Controllers
             {
                 var role = db.Roles.Find(identityRole.Id);
                 HogwartsSettingUtility.UpdateHogwartsSetting(HogwartsSettingUtility.NowDisplayRole,role.Name);
+            }
+            return Json(new { result = "Redirect", url = Url.Action("Index", "HogwartsSettings") });
+        }
+
+        public JsonResult ChangeNowLecture(Lecture lecture)
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                var lec = db.Lectures.Find(lecture.Id);
+                HogwartsSettingUtility.UpdateHogwartsSetting(HogwartsSettingUtility.NowLecture, lec.LectureName);
             }
             return Json(new { result = "Redirect", url = Url.Action("Index", "HogwartsSettings") });
         }
@@ -200,6 +221,12 @@ namespace Hogwarts.Controllers
             ajaxResult.Result = true;
             return ajaxResult.GetJsonRsult();
         }
+
+        public JsonResult TargetTraineeOfLectureSave(int lectureId,List<string> userIds)
+        {
+            return TargetTraineeOfLectureUtility.TargetTraineeOfLectureSave(lectureId, userIds);
+        }
+
         #endregion
 
     }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Hogwarts.Models
 {
@@ -11,6 +13,8 @@ namespace Hogwarts.Models
 
         public string Role { get; set; }
 
+        [AllowHtml]
+        [DataType(DataType.Html)]
         public string Content { get; set; }
 
         public string CreateUserId { get; set; }

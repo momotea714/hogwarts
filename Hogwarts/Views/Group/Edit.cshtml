@@ -1,58 +1,69 @@
 ﻿@model Hogwarts.Models.Group
 
 @{
-    ViewBag.Title = "Edit";
+    var IsEdit = ViewBag.IsEdit as bool?;
+    var groupMember = ViewBag.GroupMember as IEnumerable<Hogwarts.Models.ApplicationUser>;
 }
+<br>
+<style>
+    .editGroup {
+        max-width: 500px;
+        padding: 15px;
+        margin: 0 auto;
+    }
+</style>
 
-<h2>Edit</h2>
-
-
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Group</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.LectureId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.LectureId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.LectureId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.GroupName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.GroupName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.GroupName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Point, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Point, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Point, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </div>
+<br>
+<div class="editGroup">
+    <label class="label">グループ名</label>
+    @if (IsEdit == true)
+    {
+        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" value="@(Model.GroupName)" style="max-width:100%"/>
+    }
+    else
+    {
+        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" style="max-width:100%"/>
+    }
+    <br>
+    <label class="label">グループメンバー</label>
+    <div class="input-group">
+        <input type="text" class="form-control" id="txtUserID" placeholder="ユーザーID(社員番号)" style="max-width:100%">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button">
+                <i class='glyphicon glyphicon-plus'>追加</i>
+            </button>
+        </span>
     </div>
-}
+    <table id="tblGroupMember" class="table">
+        <tr>
+            <th>ID</th>
+            <th>名前</th>
+            <th></th>
+        </tr>
+        <tbody id="tbGroupMember">
+            @if (IsEdit == true)
+            {
+                foreach (var member in groupMember)
+                {
+                    @Html.Action("MemberView", new { userId = member.Id })
+                }
+            }
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    @if (IsEdit == true)
+    {
+        <input type="button" id="btnUpdateRegist" class="btn btn-ghost" value="更新" />
+    }
+    else
+    {
+        <input type="button" id="btnNewRegist" class="btn btn-ghost" value="登録" />
+    }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
 </div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}

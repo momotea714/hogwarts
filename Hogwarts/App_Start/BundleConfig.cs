@@ -40,6 +40,15 @@ namespace Hogwarts
             bundles.Add(new ScriptBundle("~/bundles/star-rating").Include(
                       "~/Scripts/star-rating.min.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/ckeditor/ckeditor").Include(
+                      "~/Scripts/ckeditor/ckeditor.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/ckeditor/adapters/cleditoradapters").Include(
+                      "~/Scripts/ckeditor/adapters/jquery.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/layout").Include(
+                      "~/Scripts/jquery.layout.js"));
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/bootstrap-table-expandable.css",
@@ -56,6 +65,9 @@ namespace Hogwarts
 
             bundles.Add(new StyleBundle("~/Content/accordion").Include(
                       "~/Content/jstree/FlexibleSlideToTopAccordion.css"));
+
+            bundles.Add(new StyleBundle("~/Content/layout").Include(
+                      "~/Content/layout-default.css"));
 
             bundles.Add(new StyleBundle("~/Content/jqueryui").Include(
                       "~/Content/jquery-ui.min.css",

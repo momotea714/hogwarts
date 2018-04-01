@@ -1,45 +1,43 @@
-﻿@model IEnumerable<Hogwarts.Models.Group>
-
+﻿
 @{
-    ViewBag.Title = "Index";
+    var nowLecture = ViewBag.NowLecture as string;
 }
 
-<h2>Index</h2>
+@Styles.Render("~/Content/jqueryui")
+@Styles.Render("~/Content/layout")
+@Scripts.Render("~/bundles/jqueryui")
+@Scripts.Render("~/bundles/layout")
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.LectureId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.GroupName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Point)
-        </th>
-        <th></th>
-    </tr>
+<div id="layout" style="height:90vh;">
+    <div class="ui-layout-north">
+        現在講義：　@(nowLecture)
+    </div>
+    <div class="ui-layout-west">
+        @Html.ActionLink("グループ追加", "Edit", "Group", new { area = "" }, new { @class = "btn-ghost" })
+        <div id="divGroupList">
+            @Html.Action("GroupListView")
+        </div>
+    </div>
+    <div class="ui-layout-center">
+        メンバー進捗
+        <input type="button" class="btn-ghost RefreshGroupMemberProgress" value="更新" />
+        <div id="divGroupMemberProgress">
+            @Html.Action("GroupMemberProgressView")
+        </div>
+    </div>
+    <div class="ui-layout-east">
+        グループ別進捗
+        <input type="button" class="btn-ghost RefreshGroupProgress" value="更新" />
+        <div id="divGroupProgress">
+            @Html.Action("GroupProgressView")
+        </div>
+    </div>
+    @*<div class="ui-layout-south">South</div>*@
+</div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.LectureId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.GroupName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Point)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+<script type="text/javascript">
+    $(function () {
+        $("#layout").layout();
+    });
+</script>
 
-</table>

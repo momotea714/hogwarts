@@ -29,7 +29,9 @@ namespace Hogwarts
             UserUtility.CreateRole("59th");
             UserUtility.CreateRole("60th");
 
-            HogwartsSettingUtility.CreateHogwartsSettingInitialize(HogwartsSettingUtility.NowDisplayRole, "52th");
+            HogwartsSettingUtility.CreateHogwartsSettingInitialize(HogwartsSettingUtility.NowDisplayRole, "Sample");
+
+            HogwartsSettingUtility.CreateHogwartsSettingInitialize(HogwartsSettingUtility.NowLecture, null);
 
             UserUtility.CreateUser("manager", "manager", "manager@test.com", "P@ssw0rd", "Admin");
             UserUtility.CreateRole("Sample");

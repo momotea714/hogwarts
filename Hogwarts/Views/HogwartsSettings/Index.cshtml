@@ -5,7 +5,9 @@
     @Scripts.Render("~/bundles/bootstrap_select")
 
     var roles = ViewBag.Roles as IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>;
+    var lecturesForSelectBox = ViewBag.LecturesForSelectBox as IEnumerable<Hogwarts.Models.Lecture>;
     var nowDisplayRole = ViewBag.NowDisplayRole as string;
+    var nowLecture = ViewBag.NowLecture as string;
 }
 
 <style>
@@ -56,7 +58,7 @@
 <div id="wrap">
     <h2>
         <label for="selRole" class="label">表示グループ設定</label>
-        <select id="selRole" name="selRole" class="selectpicker" title="今期は？">
+        <select id="selRole" name="selRole" class="selectpicker selRole" title="今期は？">
             @foreach (var role in roles)
             {
                 if (role.Name == nowDisplayRole)
@@ -66,6 +68,21 @@
                 else
                 {
                     <option value="@(role.Id)">@(role.Name)</option>
+                }
+            }
+        </select>
+
+        <label for="selNowLecture" class="label">現在講義設定</label>
+        <select id="selNowLecture" name="selNowLecture" class="selectpicker selNowLecture" title="現在の講義は？">
+            @foreach (var lecture in lecturesForSelectBox)
+            {
+                if (lecture.LectureName == nowLecture)
+                {
+                    <option value="@(lecture.Id)" selected>@(lecture.LectureName)</option>
+                }
+                else
+                {
+                    <option value="@(lecture.Id)">@(lecture.LectureName)</option>
                 }
             }
         </select>
@@ -95,12 +112,17 @@
 
         //on change function i need to control selected value
         $('select.selectpicker').on('change', function () {
-            var selected = $('.selectpicker option:selected').val();
+            var ajaxData = {};
 
-            var ajaxData =
-            {
-                    Id: selected //1:Lecture,2:SubLecture,3:Question
-                };
+            var url = '';
+            if ($(this).hasClass('selRole')) {
+                url = '@Url.Action("ChangeNowDisplayRole", "HogwartsSettings")';
+                ajaxData.Id = $('.selectpicker option:selected')[0].value;
+            }
+            else if ($(this).hasClass('selNowLecture')) {
+                url = '@Url.Action("ChangeNowLecture", "HogwartsSettings")';
+                ajaxData.Id = $('.selectpicker option:selected')[1].value;
+            }
 
             var h = $(window).height();
             $('#wrap').css('display', 'none');
@@ -108,7 +130,7 @@
 
         $.ajax({
             type: "POST",
-            url: '@Url.Action("ChangeNowDisplayRole", "HogwartsSettings")',
+            url: url,
             data: ajaxData,
             dataType: "json"
         }).done(function (response, textStatus, jqXHR) {

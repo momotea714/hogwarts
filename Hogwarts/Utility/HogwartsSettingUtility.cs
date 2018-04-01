@@ -11,6 +11,8 @@ namespace Hogwarts.Utility
         //ここで持つプロパティはstartup.csで設定してあげて。
         public static string NowDisplayRole = "NowDisplayRole";
 
+        public static string NowLecture = "NowLecture";
+
         public static string GetSetting(string settingId)
         {
             var setting = string.Empty;

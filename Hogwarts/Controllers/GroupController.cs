@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Hogwarts.Models;
+using Hogwarts.Utility;
 
 namespace Hogwarts.Controllers
 {
@@ -15,48 +16,13 @@ namespace Hogwarts.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        #region CRUD
+
         // GET: Group
         public ActionResult Index()
         {
-            return View(db.Groups.ToList());
-        }
-
-        // GET: Group/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Group group = db.Groups.Find(id);
-            if (group == null)
-            {
-                return HttpNotFound();
-            }
-            return View(group);
-        }
-
-        // GET: Group/Create
-        public ActionResult Create()
-        {
+            ViewBag.NowLecture = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowLecture);
             return View();
-        }
-
-        // POST: Group/Create
-        // 過多ポスティング攻撃を防止するには、バインド先とする特定のプロパティを有効にしてください。
-        // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,LectureId,GroupName,Point")] Group group)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Groups.Add(group);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(group);
         }
 
         // GET: Group/Edit/5
@@ -64,14 +30,20 @@ namespace Hogwarts.Controllers
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                ViewBag.IsEdit = false;
+                return View(new Group());
             }
-            Group group = db.Groups.Find(id);
-            if (group == null)
+            else
             {
-                return HttpNotFound();
+                ViewBag.IsEdit = true;
+                var group = db.Groups.Find(id);
+                if (group == null)
+                {
+                    return HttpNotFound();
+                }
+                ViewBag.GroupMember = db.GroupMembers.Where(x => x.GroupId == id);
+                return View(group);
             }
-            return View(group);
         }
 
         // POST: Group/Edit/5
@@ -86,21 +58,6 @@ namespace Hogwarts.Controllers
                 db.Entry(group).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            }
-            return View(group);
-        }
-
-        // GET: Group/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Group group = db.Groups.Find(id);
-            if (group == null)
-            {
-                return HttpNotFound();
             }
             return View(group);
         }
@@ -124,5 +81,31 @@ namespace Hogwarts.Controllers
             }
             base.Dispose(disposing);
         }
+
+        #endregion
+
+        #region PartialView
+
+        public ActionResult GroupListView()
+        {
+            return PartialView("_GroupListView", db.Groups.ToList());
+        }
+
+        public ActionResult GroupMemberProgressView()
+        {
+            return PartialView("_GroupMemberProgressView");
+        }
+
+        public ActionResult GroupProgressView()
+        {
+            return PartialView("_GroupProgressView");
+        }
+
+        public ActionResult MemberView(string userId)
+        {
+            return PartialView("_MemberView",db.Users.Find(userId));
+        }
+
+        #endregion
     }
 }

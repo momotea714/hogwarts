@@ -1,0 +1,39 @@
+﻿@{
+    var lectureId = ViewBag.LectureId as int?;
+    var allTrainee = ViewBag.AllTrainee as IEnumerable<Hogwarts.Models.ApplicationUser>;
+    var targetTraineeOfLectures = ViewBag.TargetTraineeOfLectures as IEnumerable<Hogwarts.Models.TargetTraineeOfLecture>;
+}
+
+<table class="table table-hover table-striped tbl_TargetTraineeOfLecture" data-lectureId="@(lectureId.ToString())"
+       style="color:black;">
+    <thead id="tbl_head_TargetTraineeOfLecture">
+        <tr>
+            <th>
+                対象
+            </th>
+            <th>
+                ID
+            </th>
+            <th>
+                名前
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in allTrainee)
+        {
+            var isTarget = targetTraineeOfLectures.Any(x => x.UserId == user.Id);
+            <tr id="trTargetTraineeOfLecture_User_@(user.Id)">
+                <td>
+                    <input type="checkbox" name="chk_body_TargetTraineeOfLecture" data-userId="@(user.Id)" @(isTarget ? @"checked=\'checked'":"") />
+                </td>
+                <td>
+                    @(user.UserID)
+                </td>
+                <td>
+                    @(user.DisplayUserName)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

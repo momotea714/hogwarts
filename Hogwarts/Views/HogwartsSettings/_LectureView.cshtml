@@ -10,12 +10,13 @@
     <div>
         <input type="button" class="btn-xs Addbtn AddSubLecture" data-lectureId="@(lecture.Id)" value="講義内容追加" />
         <input type="button" class="btn-xs Updatebtn UpdateLectureName" data-lectureId="@(lecture.Id)" value="講義名修正" />
-        <input type="button" class="btn-xs Deletebtn DeleteLecture" data-lectureId="@(lecture.Id)" value="講義削除" />
+        <input type="button" class="btn-xs SelectTraineesbtn SelectTrainee" data-lectureId="@(lecture.Id)" value="受講者選択" data-toggle="modal" data-target="#modal_TargetTraineeOfLecture" />
+        <input type="button" class="btn-xs Deletebtn DeleteLecture pull-right" data-lectureId="@(lecture.Id)" value="講義削除" />
         <div id="divSubLecture_@(lecture.Id)">
             @foreach (var subLecture in subLectures)
-            {
-                @Html.Action("SubLectureView", new { subLectureId = subLecture.Id })
-            }
+        {
+            @Html.Action("SubLectureView", new { subLectureId = subLecture.Id })
+    }
         </div>
     </div>
 </div>

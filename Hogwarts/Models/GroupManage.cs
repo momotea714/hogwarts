@@ -21,11 +21,11 @@ namespace Hogwarts.Models
     public class GroupMember
     {
         public int Id { get; set; }
-
+        //AspNetRoles.Name
         public string Role { get; set; }
 
         public int GroupId { get; set; }
-
+        //AspNetUser.Id
         public string UserId { get; set; }
     }
 }

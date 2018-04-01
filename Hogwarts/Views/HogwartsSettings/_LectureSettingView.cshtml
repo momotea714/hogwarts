@@ -8,6 +8,14 @@
 
     var lectures = ViewBag.Lectures as IEnumerable<Hogwarts.Models.Lecture>;
 }
+
+<style>
+    .modal {
+        overflow-y: auto;
+        max-height: 90%;
+    }
+</style>
+
 <div id="LectureSetting">
     <input type="button" class="btn-ghost Addbtn AddLecture" value="講義追加" />
     <div id="divLecture">
@@ -17,6 +25,30 @@
         }
     </div>
 </div>
+
+<div class="modal fade" id="modal_TargetTraineeOfLecture" tabindex="-1" role="dialog" aria-labelledby="lblTargetTraineeOfLectureModalTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lblTargetTraineeOfLectureModalTitle" style="color:black">
+                    受講者選択　　
+                    <label style="color:black"><input type="checkbox" id="AllCheckTargetTraineeOfLecturebtn" /> 全選択</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </h5>
+            </div>
+            <div id="modal_bodyTargetTraineeOfLecture" class="modal-body">
+                @*TargetTraineeOfLectureView*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="modal_TargetTraineeOfLecture_savebtn">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 $(function () {
 
@@ -41,7 +73,6 @@ $(function () {
                 icons: icons,
             });
         }
-
     }
 
     SetAccordion(null);
@@ -64,6 +95,84 @@ $(function () {
             DeleteObject(this);
         }
     });
+
+    $('#AllCheckTargetTraineeOfLecturebtn').on('change', function () {
+        $('input[name=chk_body_TargetTraineeOfLecture]').prop('checked', this.checked);
+    });
+
+    $('#modal_TargetTraineeOfLecture').on('show.bs.modal', function (event) {
+        SetTargetTraineeOfLecture($(event.relatedTarget).attr('data-lectureId'));
+    });
+
+    $("#modal_TargetTraineeOfLecture_savebtn").on('click', function (event) {
+        SaveTargetTraineeOfLecture();
+    });
+
+    $.fn.checkboxSelectAll = function () {
+        $(document).on('click', this.selector + ' th input[type="checkbox"]', function (event) {
+            var table = $(event.target).parents('table');
+            $('td input[type="checkbox"]', table).attr('checked', event.target.checked);
+        });
+    };
+
+    function SaveTargetTraineeOfLecture() {
+        var lectureId = $('.tbl_TargetTraineeOfLecture').attr("data-lectureId");
+        var values = jQuery('input[name="chk_body_TargetTraineeOfLecture"]:checked').map(function (i, value) {
+            return value.dataset.userid;
+        });
+        var userIds = [];
+        $.each(values, function (index, value) {
+            userIds.push(value);
+        });
+
+        if (userIds.lenth == 0) {
+            alert('受講者が選択されていません。');
+            return false;
+        }
+
+        var ajaxData =
+            {
+                lectureId: lectureId,
+                userIds: userIds
+            };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("TargetTraineeOfLectureSave", "HogwartsSettings")',
+            data: ajaxData,
+            //data: '{ "lectureId":' + lectureId + ',"userIds":' + JSON.stringify(userIds) + '}',
+            dataType: "json"
+        }).done(function (response, textStatus, jqXHR) {
+            $('#AllCheckTargetTraineeOfLecturebtn').prop('checked',false);
+            $('#modal_TargetTraineeOfLecture').modal('hide');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    }
+
+    function SetTargetTraineeOfLecture(lectureId) {
+
+        $("#modal_bodyTargetTraineeOfLecture").empty();
+
+        var ajaxData =
+            {
+                lectureId: lectureId
+            };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("TargetTraineeOfLectureView", "HogwartsSettings")',
+                    data: ajaxData,
+                    dataType: "html"
+        }).done(function (response, textStatus, jqXHR) {
+            $('#modal_bodyTargetTraineeOfLecture').append(response);
+            $('#chk_head_TargetTraineeOfLecture').checkboxSelectAll();
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
+    };
 
     function AddObject(btn,name) {
         var addNodeCategoryCD = 0;
@@ -92,30 +201,30 @@ $(function () {
                 NodeCategoryCD: addNodeCategoryCD //1:Lecture,2:SubLecture,3:Question
                 , ParentId: parentId
                 ,Text:name
-        };
+            };
 
         $.ajax({
             type: "POST",
             url: '@Url.Action("AddTreeObject", "HogwartsSettings")',
                     data: ajaxData,
                     dataType: "json"
-                }).done(function (response, textStatus, jqXHR) {
-                    if (response.Result) {
-                        if (response.Message != null && response.Message != '') {
-                            alert(response.Message);
-                            return;
-                        }
-                        GetPartialView(response.ResultData.NodeCategoryCD
-                            , response.ResultData.Data.Id
-                            , ajaxData.ParentId);
-                    }
-                    else {
-                        alert(response.Message);
-                    }
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert(errorThrown);
-                }).always(function (jqXHR, textStatus) {
-                });
+        }).done(function (response, textStatus, jqXHR) {
+            if (response.Result) {
+                if (response.Message != null && response.Message != '') {
+                    alert(response.Message);
+                    return;
+                }
+                GetPartialView(response.ResultData.NodeCategoryCD
+                    , response.ResultData.Data.Id
+                    , ajaxData.ParentId);
+            }
+            else {
+                alert(response.Message);
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        }).always(function (jqXHR, textStatus) {
+        });
     };
 
     function UpdateObject(btn,name) {

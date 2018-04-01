@@ -42,6 +42,8 @@ namespace Hogwarts.Models
         public DbSet<Record> Records { get; set; }
 
         public DbSet<Ask> Asks { get; set; }
+
+        public DbSet<TargetTraineeOfLecture> TargetTraineeOfLectures { get; set; }
     }
 
 }
