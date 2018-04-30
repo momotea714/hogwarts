@@ -4,20 +4,63 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using Hogwarts.Models;
+using Hogwarts.Utility;
+using HtmlAgilityPack;
 
 namespace Hogwarts.Controllers
 {
+    [Authorize]
     public class AsksController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        #region CRUD
         // GET: Asks
         public ActionResult Index()
         {
-            return View(db.Asks.ToList());
+            var role = HogwartsSettingUtility.GetNowDisplayRole();
+            var asks = db.Asks.Where(x => x.Role == role
+                                       && x.ParentAskId == -1)
+                              .OrderByDescending(x => x.UpdateDateTime)
+                              .ToList();
+            var answer = db.Asks.Where(x => x.Role == role
+                                       && x.ParentAskId != -1)
+                              .OrderBy(x => x.UpdateDateTime)
+                              .ToList();
+            var users = UserUtility.GetUserListInNowDisplayGroup().ToDictionary(u => u.Id);
+            var askViewModels = asks.Select(x =>
+            {
+                ApplicationUser user;
+                var existUser = false;
+                var isMyAsk = false;
+                if (users.TryGetValue(x.CreateUserId, out user))
+                {
+                    existUser = true;
+                    if (user.UserID == User.Identity.Name)
+                    {
+                        isMyAsk = true;
+                    }
+                }
+                return new AskViewModel
+                {
+                    Id = x.Id,
+                    ParentAskId = x.ParentAskId,
+                    Content = HtmlToPlainText(x.Content),
+                    CreateDateTime = x.CreateDateTime,
+                    UpdateDateTime = x.UpdateDateTime,
+                    IsClosed = x.IsClosed,
+                    Role = x.Role,
+                    AnswerCount = answer.Count(y => y.ParentAskId == x.Id),
+                    CreateUserId = existUser ? user.UserID : "manager",
+                    CreateUserName = existUser ? user.UserName : "講師陣",
+                    IsMyAsk = isMyAsk
+                };
+            });
+            return View(askViewModels);
         }
 
         // GET: Asks/Details/5
@@ -27,11 +70,12 @@ namespace Hogwarts.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Ask ask = db.Asks.Find(id);
+            var ask = db.Asks.Find(id);
             if (ask == null)
             {
                 return HttpNotFound();
             }
+            ViewBag.Answers = db.Asks.Where(x => x.ParentAskId == ask.Id).ToList();
             return View(ask);
         }
 
@@ -46,10 +90,18 @@ namespace Hogwarts.Controllers
         // 詳細については、https://go.microsoft.com/fwlink/?LinkId=317598 を参照してください。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,ParentAskId,Content,CreateUserId,IsClosed,CreateDateTime,UpdateDateTime")] Ask ask)
+        public ActionResult Create([Bind(Include = "Id,Content")] Ask ask)
         {
             if (ModelState.IsValid)
             {
+                var role = HogwartsSettingUtility.GetNowDisplayRole();
+                var user = db.Users.Where(x => x.UserName == User.Identity.Name).First();
+                ask.CreateDateTime = DateTime.Now;
+                ask.UpdateDateTime = DateTime.Now;
+                ask.ParentAskId = -1;
+                ask.Role = role;
+                ask.IsClosed = false;
+                ask.CreateUserId = user.Id;
                 db.Asks.Add(ask);
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -82,6 +134,7 @@ namespace Hogwarts.Controllers
         {
             if (ModelState.IsValid)
             {
+                ask.UpdateDateTime = DateTime.Now;
                 db.Entry(ask).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -123,5 +176,66 @@ namespace Hogwarts.Controllers
             }
             base.Dispose(disposing);
         }
+        #endregion
+
+        #region API
+
+        public JsonResult RegistAnswer(Ask answer)
+        {
+            try
+            {
+                var ask = db.Asks.Where(x => x.Id == answer.ParentAskId).FirstOrDefault();
+                if (ask != null)
+                {
+                    var user = db.Users.Where(x => x.UserName == User.Identity.Name).First();
+                    var role = HogwartsSettingUtility.GetNowDisplayRole();
+                    answer.Role = role;
+                    answer.IsClosed = false;
+                    answer.CreateDateTime = DateTime.Now;
+                    answer.UpdateDateTime = DateTime.Now;
+                    answer.CreateUserId = user.Id;
+                    db.Asks.Add(answer);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    return Json(new { result = "Error", message = "該当する質問は存在しません" });
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return Json(new { result = "Redirect", url = Url.Action("Index", "Asks") });
+        }
+
+        #endregion
+
+        #region Method
+
+        private static string HtmlToPlainText(string html)
+        {
+            const string tagWhiteSpace = @"(>|$)(\W|\n|\r)+<";//matches one or more (white space or line breaks) between '>' and '<'
+            const string stripFormatting = @"<[^>]*(>|$)";//match any character between '<' and '>', even when end tag is missing
+            const string lineBreak = @"<(br|BR)\s{0,1}\/{0,1}>";//matches: <br>,<br/>,<br />,<BR>,<BR/>,<BR />
+            var lineBreakRegex = new Regex(lineBreak, RegexOptions.Multiline);
+            var stripFormattingRegex = new Regex(stripFormatting, RegexOptions.Multiline);
+            var tagWhiteSpaceRegex = new Regex(tagWhiteSpace, RegexOptions.Multiline);
+
+            var text = html;
+            //Decode html specific characters
+            text = System.Net.WebUtility.HtmlDecode(text);
+            //Remove tag whitespace/line breaks
+            text = tagWhiteSpaceRegex.Replace(text, "><");
+            //Replace <br /> with line breaks
+            text = lineBreakRegex.Replace(text, Environment.NewLine);
+            //Strip formatting
+            text = stripFormattingRegex.Replace(text, string.Empty);
+
+            return text.Length > 50 ? text.Substring(0, 50) : text;
+        }
+
+        #endregion
     }
 }

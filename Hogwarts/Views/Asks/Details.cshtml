@@ -1,66 +1,137 @@
 ﻿@model Hogwarts.Models.Ask
 
+@Scripts.Render("~/bundles/ckeditor/ckeditor")
+@Scripts.Render("~/bundles/ckeditor/adapters/ckeditoradapters")
+
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "質問-詳細";
+    var answers = ViewBag.Answers as IEnumerable<Hogwarts.Models.Ask>;
 }
-
-<h2>Details</h2>
-
-<div>
-    <h4>Ask</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.ParentAskId)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ParentAskId)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.CreateUserId)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CreateUserId)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.IsClosed)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.IsClosed)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.CreateDateTime)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CreateDateTime)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.UpdateDateTime)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.UpdateDateTime)
-        </dd>
-
-    </dl>
+<div class="row">
+    <div class="col-md-6">
+        <div style="height:80vh; overflow-y:auto;">
+            <h2>詳細</h2>
+            <table>
+                <tr>
+                    <td>
+                        質問者：@Html.DisplayFor(model => model.CreateUserId)
+                        <p style="font-size:12px;">
+                            追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.CreateDateTime))
+                            更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.UpdateDateTime))
+                        </p>
+                        <div class="col-md-12" style="word-wrap: break-word;">
+                            @Html.Raw(Model.Content)
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h2>回答一覧</h2>
+            <table>
+                @if (answers.Any())
+                {
+                    foreach (var answer in answers)
+                    {
+                        <tr>
+                            <td>
+                                回答者：@Html.DisplayFor(model => answer.CreateUserId)
+                                <p style="font-size:12px;">
+                                    追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.CreateDateTime))
+                                    更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.UpdateDateTime))
+                                </p>
+                                <div style="word-wrap: break-word;">
+                                    @Html.Raw(answer.Content)
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            回答はありません。
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <p>
+            <br>
+            <input type="button" id="btnRegistAnswer" class="btn btn-ghost col-md-offset-10" value="回答する" />
+        </p>
+        <div class="col-md-12">
+            @Html.TextArea("sampleEditor", new { @class = "ckeditor", @id = "sampleEditor" })
+        </div>
+    </div>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+<script type="text/javascript">
+    $(function () {
+        CKEDITOR.replace('sampleEditor',
+            {
+                toolbar: [
+                    { name: 'clipboard', groups: ['clipboard', 'undo'], items: [] },
+                    { name: 'editing', groups: ['find', 'selection', 'spellchecker'], items: ['Scayt'] },
+                    { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                    { name: 'tools', items: ['Maximize'] },
+                    { name: 'document', groups: ['mode', 'document', 'doctools'], items: ['Source'] },
+                    { name: 'others', items: ['-'] },
+                    '/',
+                    { name: 'basicstyles', groups: ['basicstyles', 'cleanup'], items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
+                    { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'], items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                    { name: 'styles', items: ['Styles', 'Format'] },
+                ],
+                toolbarGroups: [
+                    { name: 'clipboard', groups: ['clipboard', 'undo'] },
+                    { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+                    { name: 'links' },
+                    { name: 'insert' },
+                    { name: 'forms' },
+                    { name: 'tools' },
+                    { name: 'document', groups: ['mode', 'document', 'doctools'] },
+                    { name: 'others' },
+                    '/',
+                    { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                    { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] },
+                    { name: 'styles' },
+                    { name: 'colors' },
+                ],
+                uiColor: '#9AB8F3'
+            });
+
+        $("#btnRegistAnswer").on('click', function (event) {
+            RegistAnswer();
+        });
+
+        function RegistAnswer() {
+            var ajaxData = {};
+            ajaxData.ParentAskId = @(Model.Id);
+            ajaxData.Content = CKEDITOR.instances.sampleEditor.getData();
+
+            if (ajaxData.Content === "") {
+                return false;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RegistAnswer", "Asks")',
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect')
+                    window.location = response.url;
+                if (response.result == 'Error')
+                    alert(response.message);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+    });
+</script>

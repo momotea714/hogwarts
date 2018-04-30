@@ -7,7 +7,7 @@
     var roles = ViewBag.Roles as IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>;
     var lecturesForSelectBox = ViewBag.LecturesForSelectBox as IEnumerable<Hogwarts.Models.Lecture>;
     var nowDisplayRole = ViewBag.NowDisplayRole as string;
-    var nowLecture = ViewBag.NowLecture as string;
+    var nowLecture = ViewBag.NowLecture as Hogwarts.Models.Lecture;
 }
 
 <style>
@@ -76,7 +76,7 @@
         <select id="selNowLecture" name="selNowLecture" class="selectpicker selNowLecture" title="現在の講義は？">
             @foreach (var lecture in lecturesForSelectBox)
             {
-                if (lecture.LectureName == nowLecture)
+                if (lecture.LectureName == nowLecture.LectureName)
                 {
                     <option value="@(lecture.Id)" selected>@(lecture.LectureName)</option>
                 }
@@ -128,22 +128,22 @@
             $('#wrap').css('display', 'none');
             $('#loader-bg ,#loader').height(h).css('display', 'block');
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: ajaxData,
-            dataType: "json"
-        }).done(function (response, textStatus, jqXHR) {
-            if (response.result == 'Redirect') {
-                window.location = response.url;
-            }
-            else {
-                alert('更新失敗F5してからもう一度お願いします');
-            }
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        }).always(function (jqXHR, textStatus) {
-        });
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect') {
+                    window.location = response.url;
+                }
+                else {
+                    alert('更新失敗F5してからもう一度お願いします');
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
         });
     });
 </script>

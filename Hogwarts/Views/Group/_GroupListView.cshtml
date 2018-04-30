@@ -2,7 +2,7 @@
 
 <br>
 <br>
-<table class="table table-hover">
+<table id="tblGroup" class="table table-hover">
     <tr>
         <th>
             グループ名
@@ -11,12 +11,12 @@
     </tr>
     @foreach (var item in Model)
     {
-        <tr>
+        <tr id="tr_group_@(item.Id)">
             <td>
                 @Html.DisplayFor(modelItem => item.GroupName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id })
             </td>
         </tr>
     }

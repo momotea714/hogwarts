@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Hogwarts.Models.Knowledge>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "知識共有";
 }
 
 <h2>Index</h2>
@@ -56,32 +56,33 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.IncludeCategoryName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Content)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsPublic)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CreateUserId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CreateDateTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UpdateDateTime)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IncludeCategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsPublic)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreateUserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreateDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdateDateTime)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
 
 </table>

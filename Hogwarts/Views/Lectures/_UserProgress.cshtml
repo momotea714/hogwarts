@@ -8,6 +8,8 @@
     var lectures = ViewBag.Lectures as IEnumerable<Hogwarts.Models.Lecture>;
     var subLectures = ViewBag.SubLectures as IEnumerable<Hogwarts.Models.SubLecture>;
     var questions = ViewBag.Questions as IEnumerable<Hogwarts.Models.Question>;
+    var userAnswerStates = ViewBag.UserAnswerStates as IEnumerable<Hogwarts.Models.UserAnswerState>;
+    var nowLecture = ViewBag.NowLecture as Hogwarts.Models.Lecture;
 }
 
 <style>
@@ -66,7 +68,13 @@
                             <tbody>
                                 @foreach (var question in questions.Where(x => x.SubLectureId == subLecture.Id))
                                 {
-
+                                    var answerState = userAnswerStates.Where(x => x.QuestionId == question.Id).FirstOrDefault();
+                                    if (answerState == null)
+                                    {
+                                        answerState = new Hogwarts.Models.UserAnswerState();
+                                        answerState.Progress = 0;
+                                        answerState.UnderStandingLevel = 0;
+                                    }
                                     <tr>
                                         <td>
                                             @question.QuestionName
@@ -75,16 +83,16 @@
                                             <input type="text" class="rating" value="@question.Difficulty" data-size="xs" title="" data-readonly="true" data-show-clear="false" data-show-caption="false">
                                         </td>
                                         <td>
-                                            <div id="sldProgress_question_@(question.Id.ToString())" class="slider_progress">
+                                            <div id="sldProgress_question_@(question.Id.ToString())" class="slider_progress" data-value="@(answerState.Progress)">
                                                 <div class="ui-slider-handle"></div>
                                             </div>
-                                            <label id="lblProgress_question_@(question.Id.ToString())"></label>
+                                            <label id="lblProgress_question_@(question.Id.ToString())">@(answerState.Progress)%</label>
                                         </td>
                                         <td>
-                                            <div id="sldUnderStand_question_@(question.Id.ToString())" class="slider_understand">
+                                            <div id="sldUnderStand_question_@(question.Id.ToString())" class="slider_understand" data-value="@(answerState.UnderStandingLevel)">
                                                 <div class="ui-slider-handle"></div>
                                             </div>
-                                            <label id="lblUnderStand_question_@(question.Id.ToString())"></label>
+                                            <label id="lblUnderStand_question_@(question.Id.ToString())">@(answerState.UnderStandingLevel)%</label>
                                         </td>
                                         <td>
                                             <textarea rows="2" cols="30"></textarea>
@@ -106,6 +114,7 @@
             header: "ui-icon-circle-arrow-e",
             activeHeader: "ui-icon-circle-arrow-s"
         };
+
         $(".accordion").accordion({
             collapsible: true,
             active: false,
@@ -126,16 +135,16 @@
         var slider_progress = $(".slider_progress");
         var slider_understand = $(".slider_understand");
         slider_progress.each(function () {
-            SetSlider($(this));
+            SetSlider($(this), $(this).data('value'));
         });
 
         slider_understand.each(function () {
-            SetSlider($(this));
+            SetSlider($(this), $(this).data('value'));
         });
 
-        function SetSlider(sliderObj) {
+        function SetSlider(sliderObj,value) {
             sliderObj.empty().slider({
-                value: 0,
+                value: value,
                 min: 0,
                 max: 100,
                 range: "max",
@@ -145,6 +154,44 @@
                     sliderObj.siblings().text(ui.value);
                     var id = sliderObj[0].id.replace("sld", "lbl");
                     $('#' + id).text(ui.value.toString() + "%")
+                },
+                change: function (event, ui) {
+                    var id;
+                    var value = ui.value;
+                    var updateKBN; //0:progress,1:understand
+                    if ($(this).hasClass('slider_progress')) {
+                        id = this.id.replace('sldProgress_question_','');
+                        updateKBN = 0;
+                    }
+                    else {
+                        id = this.id.replace('sldUnderStand_question_', '');
+                        updateKBN = 1;
+                    }
+
+                    var ajaxData = {
+                        Id: id,
+                        Value: value,
+                        UpdateKBN:updateKBN
+                    };
+
+                    var url = '@Url.Action("UpdateAnswerState", "Lectures")';
+
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: ajaxData,
+                        dataType: "json"
+                    }).done(function (response, textStatus, jqXHR) {
+                        //if (response.result == 'Redirect') {
+                        //    window.location = response.url;
+                        //}
+                        //else {
+                        //    alert('更新失敗F5してからもう一度お願いします');
+                        //}
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }).always(function (jqXHR, textStatus) {
+                    });
                 }
             });
         }

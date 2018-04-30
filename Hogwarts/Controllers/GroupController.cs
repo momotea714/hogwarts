@@ -21,11 +21,31 @@ namespace Hogwarts.Controllers
         // GET: Group
         public ActionResult Index()
         {
-            ViewBag.NowLecture = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowLecture);
+            var role = HogwartsSettingUtility.GetNowDisplayRole();
+            var user = db.Users.Where(x => x.UserName == User.Identity.Name).First();
+            var belongGroup = db.GroupMembers.Where(x => x.Role == role
+                                                 && x.UserId == user.Id)
+                                             .FirstOrDefault();
+            Group group;
+            if (belongGroup == null)
+            {
+                group = new Group
+                {
+                    GroupName = "グループに所属していません。グループに参加してください。"
+                };
+            }
+            else
+            {
+                group = db.Groups.Where(x => x.Id == belongGroup.Id).FirstOrDefault();
+            }
+            ViewBag.MyGroup = group;
+            ViewBag.NowLecture = HogwartsSettingUtility.GetNowLecture();
+
             return View();
         }
 
         // GET: Group/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -41,7 +61,7 @@ namespace Hogwarts.Controllers
                 {
                     return HttpNotFound();
                 }
-                ViewBag.GroupMember = db.GroupMembers.Where(x => x.GroupId == id);
+                ViewBag.GroupMember = db.GroupMembers.Where(x => x.GroupId == id).ToList();
                 return View(group);
             }
         }
@@ -86,24 +106,169 @@ namespace Hogwarts.Controllers
 
         #region PartialView
 
+        [Authorize]
         public ActionResult GroupListView()
         {
             return PartialView("_GroupListView", db.Groups.ToList());
         }
 
-        public ActionResult GroupMemberProgressView()
+        [Authorize]
+        public ActionResult GroupMemberProgressView(int? groupId)
         {
+            var nowLecture = HogwartsSettingUtility.GetNowLecture();
+            var role = HogwartsSettingUtility.GetNowDisplayRole();
+            if (groupId == null)
+            {
+                var user = db.Users.Where(x => x.UserName == User.Identity.Name).First();
+                var belongGroup = db.GroupMembers.Where(x => x.Role == role
+                                                     && x.UserId == user.Id)
+                                                 .FirstOrDefault();
+                if (belongGroup == null)
+                {
+                    ViewBag.HasError = true;
+                    ViewBag.ErrorMessage = "所属がグループないか、グループを選択していません";
+                    return PartialView("_GroupMemberProgressView");
+                }
+
+                groupId = belongGroup.GroupId;
+            }
+            var subLectures = db.SubLectures.Where(x => x.LectureId == nowLecture.Id).ToList();
+            var subLectureIds = subLectures.Select(y => y.Id).ToList();
+            var members = db.GroupMembers.Where(x => x.GroupId == groupId).ToList();
+            var membersIds = members.Select(y => y.UserId).ToList();
+            var questions = db.Questions.Where(x => subLectureIds.Contains(x.SubLectureId)).ToList();
+            var questionIds = questions.Select(y => y.Id).ToList();
+
+            ViewBag.UserAnserStates = db.UserAnswerStates.Where(x =>
+                                        membersIds.Contains(x.UserId)
+                                        && questionIds.Contains(x.QuestionId)).ToList();
+            ViewBag.Questions = questions;
+            ViewBag.SubLectures = subLectures;
+            ViewBag.Members = db.Users.Where(x => membersIds.Contains(x.Id)).ToList();
+            ViewBag.HasError = false;
             return PartialView("_GroupMemberProgressView");
         }
 
         public ActionResult GroupProgressView()
         {
+            var nowLecture = HogwartsSettingUtility.GetNowLecture();
+            ViewBag.QuestionCount = db.Questions.Join(
+                                            db.SubLectures,
+                                            q => q.SubLectureId,
+                                            s => s.Id,
+                                            (q,s) => new { q, s})
+                                        .Where(x => x.s.LectureId == nowLecture.Id)
+                                        .Count();
+
+            ViewBag.Groups = db.Groups.Join(
+                                        db.GroupMembers,
+                                        g => g.Id,
+                                        gm => gm.GroupId,
+                                        (g, gm) => new { g, gm }
+                                        )
+                                  .Where(x => x.g.LectureId == nowLecture.Id)
+                                  .GroupBy(x => x.gm.GroupId)
+                                  .Select(x => new GroupViewModel
+                                  {
+                                      GroupId = x.Key,
+                                      GroupMemberCount = x.Count()
+                                  })
+                                  .ToList();
+
+            ViewBag.GroupProgress = db.Groups.Join(
+                                      db.GroupMembers,
+                                      g => g.Id,
+                                      gm => gm.GroupId,
+                                      (Group,GroupMember) => new { Group, GroupMember })
+                                  .Join(
+                                      db.UserAnswerStates,
+                                      x => x.GroupMember.UserId,
+                                      u => u.UserId,
+                                      (Group, UserAnswerState) => new { Group, UserAnswerState })
+                                  .Join(db.Questions,
+                                      x => x.UserAnswerState.QuestionId,
+                                      q => q.Id,
+                                  (Group, Questions) => new { Group, Questions })
+                                  .Join(db.SubLectures,
+                                      x => x.Questions.SubLectureId,
+                                      s => s.Id,
+                                      (Group,SubLecture) => new { Group,SubLecture })
+                                  .Where(x => x.SubLecture.LectureId == nowLecture.Id)
+                                  .GroupBy(x => x.Group.Group.Group.Group.Id)
+                                  .Select(x => new GroupProgressViewModel
+                                  {
+                                      GroupId = x.Key,
+                                      GroupName = x.Max(y => y.Group.Group.Group.Group.GroupName),
+                                      GroupProgressSum = x.Sum(y => y.Group.Group.UserAnswerState.Progress)
+                                  })
+                                  .ToList();
+
             return PartialView("_GroupProgressView");
         }
 
         public ActionResult MemberView(string userId)
         {
-            return PartialView("_MemberView",db.Users.Find(userId));
+            return PartialView("_MemberView", db.Users.Find(userId));
+        }
+
+        #endregion
+
+        #region API
+
+        public ActionResult AddMember(string userId)
+        {
+            var member = db.Users.Where(x => x.UserID == userId).Single();
+            return MemberView(member.Id);
+        }
+
+        public JsonResult RegistGroup(Group group, IEnumerable<string> UserIds, bool IsEdit)
+        {
+            var role = HogwartsSettingUtility.GetNowDisplayRole();
+            if (IsEdit)
+            {
+                var g = db.Groups.Find(group.Id);
+                g.GroupName = group.GroupName;
+                var groupMember = db.GroupMembers.Where(x => x.GroupId == group.Id);
+                db.GroupMembers.RemoveRange(groupMember);
+            }
+            else
+            {
+                group.Point = 0;
+                group.Role = role;
+                group.LectureId = HogwartsSettingUtility.GetNowLecture().Id;
+                db.Groups.Add(group);
+            }
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            foreach (var userId in UserIds)
+            {
+                var member = new GroupMember
+                {
+                    GroupId = group.Id,
+                    Role = role,
+                    UserId = userId
+                };
+                db.GroupMembers.Add(member);
+            }
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return Json(new { result = "Redirect", url = Url.Action("Index", "Group") });
         }
 
         #endregion

@@ -43,7 +43,7 @@ namespace Hogwarts
             bundles.Add(new ScriptBundle("~/bundles/ckeditor/ckeditor").Include(
                       "~/Scripts/ckeditor/ckeditor.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/ckeditor/adapters/cleditoradapters").Include(
+            bundles.Add(new ScriptBundle("~/bundles/ckeditor/adapters/ckeditoradapters").Include(
                       "~/Scripts/ckeditor/adapters/jquery.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/layout").Include(

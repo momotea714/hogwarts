@@ -13,6 +13,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Hogwarts.Controllers
 {
+    [Authorize]
     public class HogwartsSettingsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -25,7 +26,7 @@ namespace Hogwarts.Controllers
             ViewBag.Roles = UserUtility.GetAllRoleExceptAdmin();
             ViewBag.LecturesForSelectBox = LectureUtility.GetLecturesInNowRole(nowDisplayRole);
             ViewBag.NowDisplayRole = nowDisplayRole;
-            ViewBag.NowLecture = HogwartsSettingUtility.GetSetting(HogwartsSettingUtility.NowLecture);
+            ViewBag.NowLecture = HogwartsSettingUtility.GetNowLecture();
 
             return View(db.HogwartsSettings.ToList());
         }
@@ -137,7 +138,7 @@ namespace Hogwarts.Controllers
             return PartialView("_RegistUserView");
         }
 
-        public ActionResult GetPartialView(AjaxParam ajaxParam)
+        public ActionResult GetPartialView(SettingAjaxParam ajaxParam)
         {
             if (ajaxParam.NodeCategoryCD == 1)
             {
@@ -160,16 +161,16 @@ namespace Hogwarts.Controllers
         #endregion
 
         #region API
-        public JsonResult AddTreeObject(AjaxParam ajaxParam)
+        public JsonResult AddTreeObject(SettingAjaxParam ajaxParam)
         {
             return ProgressManagement.AddTreeObject(ajaxParam);
         }
-        public JsonResult EditTreeObject(AjaxParam ajaxParam)
+        public JsonResult EditTreeObject(SettingAjaxParam ajaxParam)
         {
             return ProgressManagement.EditTreeObject(ajaxParam);
         }
 
-        public JsonResult DeleteTreeObject(AjaxParam ajaxParam)
+        public JsonResult DeleteTreeObject(SettingAjaxParam ajaxParam)
         {
             return ProgressManagement.DeleteTreeObject(ajaxParam);
         }
@@ -188,8 +189,7 @@ namespace Hogwarts.Controllers
         {
             using (var db = new ApplicationDbContext())
             {
-                var lec = db.Lectures.Find(lecture.Id);
-                HogwartsSettingUtility.UpdateHogwartsSetting(HogwartsSettingUtility.NowLecture, lec.LectureName);
+                HogwartsSettingUtility.UpdateHogwartsSetting(HogwartsSettingUtility.NowLecture, lecture.Id.ToString());
             }
             return Json(new { result = "Redirect", url = Url.Action("Index", "HogwartsSettings") });
         }

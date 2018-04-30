@@ -1,10 +1,10 @@
 ﻿@model Hogwarts.Models.Information
 
 @Scripts.Render("~/bundles/ckeditor/ckeditor")
-@Scripts.Render("~/bundles/ckeditor/adapters/cleditoradapters")
+@Scripts.Render("~/bundles/ckeditor/adapters/ckeditoradapters")
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "お知らせ-修正";
 }
 
 <h2>Edit</h2>
@@ -75,3 +75,38 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+<script type="text/javascript">
+    CKEDITOR.replace('sampleEditor',
+        {
+            toolbar: [
+                { name: 'clipboard', groups: ['clipboard', 'undo'], items: [] },
+                { name: 'editing', groups: ['find', 'selection', 'spellchecker'], items: ['Scayt'] },
+                { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                { name: 'tools', items: ['Maximize'] },
+                { name: 'document', groups: ['mode', 'document', 'doctools'], items: ['Source'] },
+                { name: 'others', items: ['-'] },
+                '/',
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'], items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
+                { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'], items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'styles', items: ['Styles', 'Format'] },
+            ],
+            toolbarGroups: [
+                { name: 'clipboard', groups: ['clipboard', 'undo'] },
+                { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+                { name: 'links' },
+                { name: 'insert' },
+                { name: 'forms' },
+                { name: 'tools' },
+                { name: 'document', groups: ['mode', 'document', 'doctools'] },
+                { name: 'others' },
+                '/',
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] },
+                { name: 'styles' },
+                { name: 'colors' },
+            ],
+            uiColor: '#9AB8F3'
+        });
+</script>

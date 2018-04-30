@@ -80,7 +80,16 @@ namespace Hogwarts.Models
         public DateTime UpdateDateTime { get; set; }
     }
 
-    public class AjaxParam
+    public class AnswerStateAjaxParam
+    {
+        public int Id { get; set; }
+        public int Value { get; set; }
+        public string Remark { get; set; }
+        //0:progress,1:update
+        public int UpdateKBN { get; set; }
+    }
+
+    public class SettingAjaxParam
     {
         public int NodeCategoryCD { get; set; }
         public int ParentId { get; set; }
@@ -90,9 +99,72 @@ namespace Hogwarts.Models
         public int EstimateTime { get; set; }
     }
 
+    public static class AnswerStateManagement
+    {
+        public static JsonResult UpdateAnswerState(AnswerStateAjaxParam ajaxParam, ApplicationUser user)
+        {
+            var ajaxResult = new AjaxResult();
+            var role = HogwartsSettingUtility.GetNowDisplayRole();
+            UserAnswerState answerState;
+            using (var db = new ApplicationDbContext())
+            {
+                try
+                {
+                    answerState = db.UserAnswerStates.Where(x => x.QuestionId == ajaxParam.Id
+                                                            && x.UserId == user.Id).FirstOrDefault();
+                    var isNew = false;
+                    if (answerState == null)
+                    {
+                        answerState = new UserAnswerState
+                        {
+                            QuestionId = ajaxParam.Id,
+                            Role = role,
+                            UserId = user.Id,
+                            UpdateDateTime = DateTime.Now,
+                        };
+                        isNew = true;
+                    }
+
+                    if (ajaxParam.UpdateKBN == 0)
+                    {
+                        answerState.Progress = ajaxParam.Value;
+                    }
+                    else if (ajaxParam.UpdateKBN == 1)
+                    {
+                        answerState.UnderStandingLevel = ajaxParam.Value;
+                    }
+                    else
+                    {
+                        ajaxResult.Message = "追加失敗。とりあえずF5更新やな";
+                        ajaxResult.ResultData = null;
+                    }
+
+                    if (isNew)
+                    {
+                        db.UserAnswerStates.Add(answerState);
+                    }
+                    else
+                    {
+                        db.Entry(answerState).State = EntityState.Modified;
+                    }
+                    db.SaveChanges();
+                    ajaxResult.ResultData = answerState;
+                    ajaxResult.Result = true;
+                }
+                catch
+                {
+                    ajaxResult.Message = "追加失敗。とりあえずF5更新やな";
+                    return null;
+                }
+            }
+
+            return ajaxResult.GetJsonRsult();
+        }
+    }
+
     public static class ProgressManagement
     {
-        public static JsonResult AddTreeObject(AjaxParam ajaxParam)
+        public static JsonResult AddTreeObject(SettingAjaxParam ajaxParam)
         {
             var ajaxResult = new AjaxResult();
             if (ajaxParam.NodeCategoryCD == 1)
@@ -132,7 +204,7 @@ namespace Hogwarts.Models
             return ajaxResult.GetJsonRsult();
         }
 
-        public static JsonResult EditTreeObject(AjaxParam ajaxParam)
+        public static JsonResult EditTreeObject(SettingAjaxParam ajaxParam)
         {
             var ajaxResult = new AjaxResult();
             if (ajaxParam.NodeCategoryCD == 1)
@@ -172,7 +244,7 @@ namespace Hogwarts.Models
             return ajaxResult.GetJsonRsult();
         }
 
-        public static JsonResult DeleteTreeObject(AjaxParam ajaxParam)
+        public static JsonResult DeleteTreeObject(SettingAjaxParam ajaxParam)
         {
             var ajaxResult = new AjaxResult();
             if (ajaxParam.NodeCategoryCD == 1)
@@ -215,7 +287,7 @@ namespace Hogwarts.Models
             return ajaxResult.GetJsonRsult();
         }
 
-        private static Lecture AddLecture(AjaxParam ajaxParam)
+        private static Lecture AddLecture(SettingAjaxParam ajaxParam)
         {
             var showOrder = 1;
             if (new ApplicationDbContext().Lectures.Any())
@@ -245,7 +317,7 @@ namespace Hogwarts.Models
             }
             return lecture;
         }
-        private static SubLecture AddSubLecture(AjaxParam ajaxParam)
+        private static SubLecture AddSubLecture(SettingAjaxParam ajaxParam)
         {
             var showOrder = 1;
             if (new ApplicationDbContext().SubLectures.Any())
@@ -277,7 +349,7 @@ namespace Hogwarts.Models
             return subLecture;
         }
 
-        private static Question AddQuestion(AjaxParam ajaxParam)
+        private static Question AddQuestion(SettingAjaxParam ajaxParam)
         {
             var questionNO = 1;
             if (new ApplicationDbContext().Questions.Any())
@@ -316,7 +388,7 @@ namespace Hogwarts.Models
             return question;
         }
 
-        private static bool EditLecture(AjaxParam ajaxParam)
+        private static bool EditLecture(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -334,7 +406,7 @@ namespace Hogwarts.Models
             }
             return true;
         }
-        private static bool EditSubLecture(AjaxParam ajaxParam)
+        private static bool EditSubLecture(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -353,7 +425,7 @@ namespace Hogwarts.Models
             return true;
         }
 
-        private static bool EditQuestion(AjaxParam ajaxParam)
+        private static bool EditQuestion(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -374,7 +446,7 @@ namespace Hogwarts.Models
             return true;
         }
 
-        private static bool DeleteLecture(AjaxParam ajaxParam)
+        private static bool DeleteLecture(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -401,7 +473,7 @@ namespace Hogwarts.Models
             }
             return true;
         }
-        private static bool DeleteSubLecture(AjaxParam ajaxParam)
+        private static bool DeleteSubLecture(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -424,7 +496,7 @@ namespace Hogwarts.Models
             return true;
         }
 
-        private static bool DeleteQuestion(AjaxParam ajaxParam)
+        private static bool DeleteQuestion(SettingAjaxParam ajaxParam)
         {
             using (var db = new ApplicationDbContext())
             {

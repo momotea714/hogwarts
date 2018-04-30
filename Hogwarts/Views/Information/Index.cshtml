@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<Hogwarts.Models.Information>
 
 @{
+    ViewBag.Title = "お知らせ一覧";
     var informationFromNews = ViewBag.InformationFromNews as IEnumerable<Hogwarts.Models.Information>;
     var informationFromManagers = ViewBag.InformationFromManagers as IEnumerable<Hogwarts.Models.Information>;
 }

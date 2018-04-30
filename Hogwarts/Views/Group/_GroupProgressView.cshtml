@@ -1,1 +1,59 @@
 ﻿
+@{
+    var groupProgresses = ViewBag.GroupProgress as IEnumerable<Hogwarts.Models.GroupProgressViewModel>;
+    var groups = ViewBag.Groups as IEnumerable<Hogwarts.Models.GroupViewModel>;
+    var questionCount = ViewBag.QuestionCount as int?;
+}
+
+@if (!(questionCount > 0))
+{
+    <label>この講義にはまだ演習問題が設定されていません</label>
+    return;
+}
+
+@if (groupProgresses != null && groups != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                グループ名
+            </th>
+            <th>
+                進捗率
+            </th>
+        </tr>
+        @foreach (var groupProgress in groupProgresses)
+        {
+            var memberCount = groups.Where(x => x.GroupId == groupProgress.GroupId).First().GroupMemberCount;
+            if (memberCount > 0)
+            {
+                var progressSummary = groupProgress.GroupProgressSum / memberCount / questionCount;
+                <tr>
+                    <td>
+                        @(groupProgress.GroupName)
+                    </td>
+
+                    <td>
+                        @progressSummary %
+
+                    </td>
+
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        @(groupProgress.GroupName)
+                    </td>
+
+                    <td>
+                        グループメンバーが設定されていません
+                    </td>
+
+                </tr>
+            }
+
+        }
+    </table>
+}

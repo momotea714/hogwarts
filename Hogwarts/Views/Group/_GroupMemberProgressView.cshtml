@@ -1,1 +1,67 @@
-﻿
+﻿@if (ViewBag.HasError)
+{
+    <label>@ViewBag.ErrorMessage</label>
+}
+else
+{
+    var UserAnserStates = ViewBag.UserAnserStates as IEnumerable<Hogwarts.Models.UserAnswerState>;
+    var questions = ViewBag.Questions as IEnumerable<Hogwarts.Models.Question>;
+    var subLectures = ViewBag.SubLectures as IEnumerable<Hogwarts.Models.SubLecture>;
+    var members = ViewBag.Members as IEnumerable<Hogwarts.Models.ApplicationUser>;
+
+    if (questions.Any())
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    名前
+                </th>
+                <th>
+                    全体進捗
+                </th>
+                @foreach (var subLecture in subLectures)
+                {
+                    var question = questions.Where(x => x.SubLectureId == subLecture.Id);
+                    if (question.Any())
+                    {
+                        <th>
+                            @(subLecture.SubLectureName)
+                        </th>
+                    }
+
+                }
+
+            </tr>
+            @foreach (var member in members)
+            {
+                var progressSum = UserAnserStates.Where(x => x.UserId == member.Id).Sum(x => x.Progress);
+                var progressSummary = progressSum / questions.Count();
+                <tr>
+                    <td>
+                        @(member.DisplayUserName)
+                    </td>
+                    <td>
+                        @progressSummary %
+                    </td>
+                    @foreach (var subLecture in subLectures)
+                    {
+                        var question = questions.Where(x => x.SubLectureId == subLecture.Id);
+                        if (question.Any())
+                        {
+                            var progressSubLectureSum = UserAnserStates.Where(x => x.UserId == member.Id
+                                                 && question.Any(y => y.Id == x.QuestionId)).Sum(x => x.Progress);
+                            var progress = progressSubLectureSum / question.Count();
+                            <td>
+                                @progress %
+                            </td>
+                        }
+                    }
+                </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <label>この講義には演習問題が登録されていません。講師に確認してください</label>
+    }
+}

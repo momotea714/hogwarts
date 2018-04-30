@@ -1,10 +1,9 @@
 ﻿@model IEnumerable<Hogwarts.Models.Lecture>
 
 @{
-    ViewBag.Title = "Index";
-
     @Scripts.Render("~/bundles/bootstrap_select")
     @Styles.Render("~/Content/bootstrap_select")
+    ViewBag.Title = "進捗管理";
 }
 
 <h2>進捗管理</h2>
@@ -12,10 +11,10 @@
 <div id="divProgress">
     @if (User.IsInRole("Admin"))
     {
-        @Html.Action("ProgressManage")
+        @Html.Action("ProgressManage", "Lectures")
     }
     else
     {
-        @Html.Action("UserProgress")
+        @Html.Action("UserProgress", "Lectures")
     }
 </div>

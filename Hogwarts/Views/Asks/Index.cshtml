@@ -1,63 +1,90 @@
-﻿@model IEnumerable<Hogwarts.Models.Ask>
+﻿@model IEnumerable<Hogwarts.Models.AskViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "質問一覧";
 }
+<style>
+    .Title {
+        overflow: hidden;
+        padding: 0px;
+        width: 80vh;
+        line-height: 1.0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis; /* Opera */
+    }
+</style>
 
-<h2>Index</h2>
-
+<br>
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("質問を追加", "Create", "Asks", new { @class = "btn btn-ghost" })
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.ParentAskId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Content)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CreateUserId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.IsClosed)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CreateDateTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.UpdateDateTime)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.ParentAskId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Content)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CreateUserId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsClosed)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CreateDateTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UpdateDateTime)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
-
-</table>
+<div class="row">
+    <div class="col-md-6">
+        <label>回答受付中の質問</label>
+        <div style="height:75vh; overflow-y:auto;">
+            <table class="table">
+                @foreach (var item in Model.Where(x => !x.IsClosed))
+                {
+                    <tr>
+                        <td>
+                            <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
+                                <p class="Title">
+                                    @Html.DisplayFor(modelItem => item.Content)
+                                </p>
+                            </a>
+                            <p style="font-size:12px;">
+                                作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
+                                作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
+                                回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
+                            </p>
+                            @*@Html.DisplayFor(modelItem => item.ParentAskId)*@
+                            @*@Html.DisplayFor(modelItem => item.IsClosed)*@
+                            <p style="font-size:12px;">
+                                追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
+                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
+                                @if (item.IsMyAsk && item.AnswerCount == 0)
+                                {
+                                    <span>　</span>
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                                    <span>　</span>
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                }
+                            </p>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <label>解決済みの質問</label>
+        <div style="height:75vh; overflow-y:auto;">
+            <table class="table">
+                @foreach (var item in Model.Where(x => x.IsClosed))
+                {
+                    <tr>
+                        <td>
+                            <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
+                                <p class="Title">
+                                    @Html.DisplayFor(modelItem => item.Content)
+                                </p>
+                            </a>
+                            <p style="font-size:12px;">
+                                作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
+                                作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
+                                回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
+                            </p>
+                            @*@Html.DisplayFor(modelItem => item.ParentAskId)*@
+                            @*@Html.DisplayFor(modelItem => item.IsClosed)*@
+                            <p style="font-size:12px;">
+                                追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
+                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
+                            </p>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>

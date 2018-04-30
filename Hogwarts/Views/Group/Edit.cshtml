@@ -1,8 +1,9 @@
 ﻿@model Hogwarts.Models.Group
 
 @{
+    ViewBag.Title = "グループ管理";
     var IsEdit = ViewBag.IsEdit as bool?;
-    var groupMember = ViewBag.GroupMember as IEnumerable<Hogwarts.Models.ApplicationUser>;
+    var groupMember = ViewBag.GroupMember as IEnumerable<Hogwarts.Models.GroupMember>;
 }
 <br>
 <style>
@@ -18,18 +19,18 @@
     <label class="label">グループ名</label>
     @if (IsEdit == true)
     {
-        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" value="@(Model.GroupName)" style="max-width:100%"/>
+        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" value="@(Model.GroupName)" style="max-width:100%" />
     }
     else
     {
-        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" style="max-width:100%"/>
+        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" style="max-width:100%" />
     }
     <br>
     <label class="label">グループメンバー</label>
     <div class="input-group">
         <input type="text" class="form-control" id="txtUserID" placeholder="ユーザーID(社員番号)" style="max-width:100%">
         <span class="input-group-btn">
-            <button class="btn btn-default" type="button">
+            <button id="btnAddMember" class="btn btn-default" type="button">
                 <i class='glyphicon glyphicon-plus'>追加</i>
             </button>
         </span>
@@ -41,11 +42,11 @@
             <th></th>
         </tr>
         <tbody id="tbGroupMember">
-            @if (IsEdit == true)
+            @if (IsEdit == true && groupMember != null)
             {
                 foreach (var member in groupMember)
                 {
-                    @Html.Action("MemberView", new { userId = member.Id })
+                    @Html.Action("MemberView", new { userId = member.UserId })
                 }
             }
         </tbody>
@@ -53,17 +54,79 @@
     <br>
     <br>
     <br>
-    @if (IsEdit == true)
-    {
-        <input type="button" id="btnUpdateRegist" class="btn btn-ghost" value="更新" />
-    }
-    else
-    {
-        <input type="button" id="btnNewRegist" class="btn btn-ghost" value="登録" />
-    }
+    <input type="button" id="btnRegist" class="btn btn-ghost" value="@(IsEdit == true ? "更新":"登録")" />
 
     <div>
         @Html.ActionLink("Back to List", "Index")
     </div>
 
 </div>
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#btnAddMember').on('click', function () {
+            AddMember();
+        });
+
+        $('#btnRegist').on('click', function () {
+            Regist(@(IsEdit == true ? "true":"false"));
+        });
+
+        $('#tbGroupMember').on('click', '.RemoveGroupMember', function () {
+            var userId = $(this)[0].id.replace('btn_RemoveGroupMember_','');
+            $('#tr_GroupMember_' + userId).remove();
+        });
+
+        function AddMember() {
+            var userID = $('#txtUserID').val();
+
+            if (userID == null || userID == '') {
+                return;
+            }
+
+            var ajaxData = { userId: userID};
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddMember", "Group")',
+                data: ajaxData,
+                dataType: "html"
+            }).done(function (response, textStatus, jqXHR) {
+                $('#tbGroupMember').append(response);
+                $('#txtUserID').val("");
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+
+        function Regist(IsEdit) {
+            var ajaxData = {};
+            if (IsEdit) {
+                ajaxData.Id = @(Model.Id);
+            }
+            ajaxData.GroupName = $('#txtGroupName').val();
+            var membersId = [];
+            $('#tbGroupMember tr').each(function (index,value) {
+                membersId.push(value.id.replace("tr_GroupMember_",""));
+            });
+
+            ajaxData.UserIds = membersId;
+            ajaxData.IsEdit = @(IsEdit == true ? "true":"false");
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RegistGroup", "Group")',
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect')
+                    window.location = response.url;
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+    });
+</script>

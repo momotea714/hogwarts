@@ -10,6 +10,7 @@ using Hogwarts.Models;
 
 namespace Hogwarts.Controllers
 {
+    [Authorize]
     public class InformationController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

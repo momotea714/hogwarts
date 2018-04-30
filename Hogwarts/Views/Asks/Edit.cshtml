@@ -17,7 +17,7 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             @Html.LabelFor(model => model.ParentAskId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.ParentAskId, new { htmlAttributes = new { @class = "form-control" } })
@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             @Html.LabelFor(model => model.CreateUserId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.CreateUserId, new { htmlAttributes = new { @class = "form-control" } })
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             @Html.LabelFor(model => model.IsClosed, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.IsClosed, new { htmlAttributes = new { @class = "form-control" } })
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             @Html.LabelFor(model => model.CreateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.CreateDateTime, new { htmlAttributes = new { @class = "form-control" } })
@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             @Html.LabelFor(model => model.UpdateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.UpdateDateTime, new { htmlAttributes = new { @class = "form-control" } })
@@ -67,7 +67,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="修正登録" class="btn btn-default" />
             </div>
         </div>
     </div>
