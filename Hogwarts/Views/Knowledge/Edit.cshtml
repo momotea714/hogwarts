@@ -1,75 +1,71 @@
 ﻿@model Hogwarts.Models.Knowledge
 
 @{
-    ViewBag.Title = "Edit";
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/bootstrap_select")
+    @Scripts.Render("~/bundles/bootstrap_select")
+    var knowledgeCategories = ViewBag.KnowledgeCategories as IEnumerable<Hogwarts.Models.KnowledgeCategory>;
 }
 
-<h2>Edit</h2>
+<style>
+    .extrawide {
+        width: 500px;
+    }
 
+    input, select, textarea {
+        max-width: 500px;
+    }
+</style>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "Knowledge",FormMethod.Post,new { id = "form" }))
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Knowledge</h4>
-        <hr />
+
+    @Html.HiddenFor(model => model.CreateDateTime)
+    @Html.HiddenFor(model => model.UpdateDateTime)
+    @Html.HiddenFor(model => model.Role)
+    @Html.HiddenFor(model => model.IsPublic)
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-horizontal" style="margin-left:20px">
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.IncludeCategoryName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.IncludeCategoryName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.IncludeCategoryName, "", new { @class = "text-danger" })
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label extrawide">
+                <input class="mdl-textfield__input extrawide" type="text" name="Title" id="Title" value="@(Model.Title)">
+                <label class="mdl-textfield__label extrawide" for="textbox2">タイトル</label>
+            </div>
+        </div>
+        <label for="KnowledgeCategoryId" class="label">カテゴリー</label>
+        <select id="KnowledgeCategoryId" name="KnowledgeCategoryId" class="selectpicker selCategory" title="カテゴリー">
+            @foreach (var knowledgeCategory in knowledgeCategories)
+            {
+                if (knowledgeCategory.Id == Model.CategoryId)
+                {
+                    <option value="@(knowledgeCategory.Id)" selected>@(knowledgeCategory.CategoryName)</option>
+                }
+                else
+                {
+                    <option value="@(knowledgeCategory.Id)">@(knowledgeCategory.CategoryName)</option>
+                }
+            }
+        </select>
+        <div class="form-group">
+            <div class="col-md-10" hidden>
+                @Html.EditorFor(model => model.CategoryId, new { htmlAttributes = new { @class = "form-control" } })
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.Content, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Content, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.IsPublic, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.IsPublic)
-                    @Html.ValidationMessageFor(model => model.IsPublic, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreateUserId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CreateUserId, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.CreateUserId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CreateDateTime, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.CreateDateTime, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.UpdateDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.UpdateDateTime, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.UpdateDateTime, "", new { @class = "text-danger" })
+                @Html.TextAreaFor(model => model.Content, new { @class = "ckeditor", @id = "sampleEditor" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Create" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" />
             </div>
         </div>
     </div>
@@ -78,7 +74,32 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+<script type="text/javascript">
+    $(function () {
+        $('.selectpicker').selectpicker();
+
+        $('select.selectpicker').on('change', function () {
+            $('#CategoryId').val($('.selectpicker option:selected')[0].value);
+        });
+
+        $('#form').submit(function () {
+            if ($('#Title').val() == '') {
+                $('#Title').focus();
+                return false;
+            }
+
+            if (!($('.selectpicker option:selected')[0].value > 0)) {
+                $('.selectpicker option:selected').focus();
+                return false;
+            }
+            var content = CKEDITOR.instances.sampleEditor.getData();
+            if (content == '' || content == null) {
+                $('.cke_contents').focus();
+                return false;
+            }
+        })
+    });
+</script>

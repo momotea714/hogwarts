@@ -1,88 +1,285 @@
-﻿@model IEnumerable<Hogwarts.Models.Knowledge>
+﻿@*@model IEnumerable<Hogwarts.Models.Knowledge>*@
 
 @{
     ViewBag.Title = "知識共有";
+    var knowledgeCategories = ViewBag.KnowledgeCategories as IEnumerable<Hogwarts.Models.KnowledgeCategory>;
+    var knowledgeViewModels = ViewBag.KnowledgeViewModels as IEnumerable<Hogwarts.Models.KnowledgeViewModel>;
+    var displayCategory = ViewBag.DisplayCategory as Hogwarts.Models.KnowledgeCategory;
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    @*<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">*@
+    @*<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.light_blue-blue.min.css" />*@
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.pink-red.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 }
 
-<h2>Index</h2>
+<style>
+    .knowledgeTitle-card-wide {
+        margin-left: 10px;
+        width: 98%;
+        min-height: 10px;
+    }
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-    Launch demo modal
-</button>
+    .Title {
+        overflow: hidden;
+        padding: 0px;
+        width: 100vh;
+        line-height: 1.0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis; /* Opera */
+    }
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    /*.modal-backdrop {
+        z-index: -1;
+    }*/
+
+    .knowledge-card-wide {
+        margin-left: 10px;
+        width: 98%;
+        min-height: inherit;
+    }
+
+    .mdl-card__supporting-text {
+        padding: 8px 16px 5px 16px;
+    }
+
+    .mdl-card__title {
+        padding: 8px 16px 5px 16px;
+    }
+
+    .categorymodal-dialog-center {
+        margin-top: 10%;
+    }
+
+    .mdl-card__menu {
+        top: 8px;
+    }
+
+    .break-word {
+        word-break: break-all;
+        margin: 1em;
+        border: 1px solid #666666;
+    }
+
+</style>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-knowledge-layout">
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">
+            カテゴリー
+            <button id="btnShowKnowledgeCategoryModal" data-toggle="modal" data-target="#modalCreateKnowledgeCategory" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary pull-right" style="margin:30px 0 0 40px">
+                <i class="material-icons">add</i>
+            </button>
+            <span class="mdl-tooltip mdl-tooltip--left" for="btnShowKnowledgeCategoryModal">カテゴリ追加</span>
+        </span>
+        <nav class="mdl-navigation">
+            @foreach (var knowledgeCategory in knowledgeCategories)
+            {
+                <a class="mdl-navigation__link" href="@Url.Action("Index", "Knowledge",new { knowledgeCategoryId = knowledgeCategory.Id})">
+                    @(knowledgeCategory.CategoryName)
+                </a>
+            }
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div class="knowledgeTitle-card-wide mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text" style="color:black;">表示カテゴリー:　@(displayCategory.CategoryName)</h2>
+                </div>
+                <div class="mdl-card__menu">
+                    <button id="btnAddKnowledge" onclick="location.href='@Url.Action("Create","Knowledge")';" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary" style="position:absolute;right: 20px;top:0px;">
+                        <i class="material-icons">add</i>
+                        <span class="mdl-tooltip mdl-tooltip--left" for="btnAddKnowledge">知識追加</span>
+                    </button>
+                </div>
             </div>
+            <br>
+            <div style="height:75vh;overflow-y:auto;">
+                @foreach (var knowledge in knowledgeViewModels)
+                {
+                    <div class="knowledge-card-wide mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text Title" style="color:black;">@(knowledge.Title)</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text" style="color:black;">
+                            @Html.Raw(knowledge.Content)
+                            <p style="font-size:12px;margin:0;color:slategray;">
+                                更新ユーザーID：@(knowledge.CreateUserId)　
+                                更新ユーザー名：@(knowledge.UserName)　
+                                追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", knowledge.CreateDateTime))
+                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", knowledge.UpdateDateTime))
+                            </p>
+                        </div>
+
+                        <div class="mdl-card__menu">
+                            <button id="detail_@(knowledge.Id)" data-toggle="modal" data-knowledgeid="@(knowledge.Id)" data-target="#modalKnowledgeDetail" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">
+                                    description
+                                </i>
+                            </button>
+                            <div class="mdl-tooltip" data-mdl-for="detail_@(knowledge.Id)">
+                                詳細
+                            </div>
+                            <button id="update_@(knowledge.Id)" onclick="location.href='@Url.Action("Edit","Knowledge",new { id = knowledge.Id})';"  data-knowledgeid="@(knowledge.Id)" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">
+                                    feedback
+                                </i>
+                            </button>
+                            <div class="mdl-tooltip" data-mdl-for="update_@(knowledge.Id)">
+                                修正
+                            </div>
+                            <button id="delete_@(knowledge.Id)" data-toggle="modal" data-target="#modalKnowledgeDetail" data-knowledgeid="@(knowledge.Id)" class="DeleteKnowledge mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">delete</i>
+                            </button>
+                            <div class="mdl-tooltip" data-mdl-for="delete_@(knowledge.Id)">
+                                削除
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+<div class="modal fade" id="modalCreateKnowledgeCategory" tabindex="-1" data-backdrop="false" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div class="modal-dialog categorymodal-dialog-center">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">カテゴリ追加</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
             <div class="modal-body">
-                @Html.Partial("Create", new Hogwarts.Models.Knowledge())
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" name="KnowledgeCategory" id="txtKnowledgeCategory">
+                    <label class="mdl-textfield__label" for="textbox2">カテゴリ名</label>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <input type="button" id="btnAddKnowledgeCategory" value="追加" class="btn btn-success" />
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.IncludeCategoryName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Content)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.IsPublic)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CreateUserId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CreateDateTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.UpdateDateTime)
-        </th>
-        <th></th>
-    </tr>
+<div class="modal fade" id="modalKnowledgeDetail" tabindex="-1" data-backdrop="false" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div class="modal-dialog categorymodal-dialog-center">
+        <div class="modal-content break-word">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalKnowledgeTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="modalKnowledgeBody" style="height:40vh; overflow-y:auto;">
+                <div id="modalKnowledgeContent" data-knowledgeid="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btnModalDeleteKnowledge">Delete</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IncludeCategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsPublic)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateUserId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdateDateTime)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>
-        </tr>
-    }
+<script type="text/javascript">
+    $(function () {
+        $("#btnAddKnowledgeCategory").on('click', function (event) {
+            AddKnowledgeCategory();
+        });
 
-</table>
+        $("#btnModalDeleteKnowledge").on('click', function (event) {
+            DeleteKnowledge($('#modalKnowledgeContent').data('knowledgeid'));
+        });
+
+        $('#modalKnowledgeDetail').on('show.bs.modal', function (e) {
+            // do something...
+            $('#btnModalDeleteKnowledge').hide();
+            var btn = e.relatedTarget;
+            ShowKnowledgeDetail($(btn).data('knowledgeid'));
+            if ($(btn).hasClass('DeleteKnowledge')) {
+                $('#btnModalDeleteKnowledge').show();
+            }
+        })
+
+        function ShowKnowledgeDetail(knowledgeId) {
+            var ajaxData = { knowledgeId: knowledgeId};
+            var url = '@Url.Action("ShowKnowledgeDetail", "Knowledge")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.Result) {
+                    $('#modalKnowledgeTitle').text(response.ResultData.Title);
+                    $('#modalKnowledgeContent').empty();
+                    $('#modalKnowledgeContent').append(response.ResultData.Content);
+                    $('#modalKnowledgeContent').data('knowledgeid', response.ResultData.Id);
+                }
+                else {
+                    alert(response.Message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+
+        function AddKnowledgeCategory() {
+            var knowledgeCategoryName = $('#txtKnowledgeCategory').val();
+
+            if (knowledgeCategoryName == '' || knowledgeCategoryName == null) {
+                alert('カテゴリ名を入力してください。');
+                return false;
+            }
+
+            var ajaxData = { knowledgeCategoryName: knowledgeCategoryName};
+            var url = '@Url.Action("CreateKnowledgeCategory", "Knowledge")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect') {
+                    window.location = response.url;
+                }
+                else {
+                    alert(response.Message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+
+        function DeleteKnowledge(id) {
+            var ajaxData = { id: id };
+            var url = '@Url.Action("DeleteKnowledge", "Knowledge")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect') {
+                    window.location = response.url;
+                }
+                else {
+                    alert(response.Message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        }
+    });
+</script>

@@ -1,18 +1,18 @@
 ﻿@model IEnumerable<Hogwarts.Models.Group>
 
-<br>
-<br>
 <table id="tblGroup" class="table table-hover">
     <tr>
-        <th>
+        <th width="80%">
             グループ名
         </th>
-        <th></th>
+        <th width="20%">
+            @Html.ActionLink("追加", "Edit", "Group", new { area = "" }, new { @class = "mdl-button mdl-js-button GroupCunsotmButton mdl-button--raised mdl-button--colored" })
+        </th>
     </tr>
     @foreach (var item in Model)
     {
         <tr id="tr_group_@(item.Id)">
-            <td>
+            <td class="td_groupName">
                 @Html.DisplayFor(modelItem => item.GroupName)
             </td>
             <td>

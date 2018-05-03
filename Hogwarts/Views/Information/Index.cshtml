@@ -11,15 +11,15 @@
         overflow-y: auto;
     }
 </style>
-
-<br>
 <div class="row">
     <div class="col-md-6">
-        <h4>
+        <h4 style="margin-left:10px">
             講師陣よりお知らせ　　　　　
             @if (User.IsInRole("Admin"))
             {
-                @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary" })
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" onclick="location.href='@Url.Action("Create","Information",null)';">
+                    <i class="material-icons">add</i>
+                </button>
             }
         </h4>
         <div class="scrollTable">
@@ -39,7 +39,7 @@
                                 @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                             </small>
                             <p>
-                                @Html.DisplayFor(modelItem => item.Content)
+                                @Html.Raw(item.Content)
                             </p>
                         </td>
                     </tr>
@@ -48,11 +48,13 @@
         </div>
     </div>
     <div class="col-md-6">
-        <h4>
+        <h4 style="margin-left:10px">
             新人間のお知らせ　　　　　
             @if (!User.IsInRole("Admin"))
             {
-                @Html.ActionLink("Create New", "Create",null, new { @class = "btn btn-primary" })
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" onclick="location.href='@Url.Action("Create","Information",null)';">
+                    <i class="material-icons">add</i>
+                </button>
             }
         </h4>
         <div class="scrollTable">

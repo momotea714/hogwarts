@@ -3,7 +3,7 @@
 }
 
 body {
-    padding-top: 50px;
+    /*padding-top: 50px;*/
     /*padding-bottom: 20px;*/
     height: 100%;
     padding-bottom: 0;
@@ -14,7 +14,33 @@ body {
     /*padding-left: 0px;
     padding-right: 0px;*/
     background-size: cover;
-    background-image: url("../Images/Hogwarts.jpg");
+    /*background-image: url("../Images/Hogwarts.jpg");*/
+    background-color: #EFEFEF;
+    color:black;
+}
+
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.eot') format('embedded-opentype');
+    src: url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-star:before {
+    content: "\e006";
+}
+.glyphicon-star-empty:before {
+    content: "\e007";
 }
 
 .container {
@@ -39,3 +65,4 @@ select,
 textarea {
     max-width: 280px;
 }
+

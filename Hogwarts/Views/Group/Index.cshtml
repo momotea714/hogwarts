@@ -1,14 +1,8 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "グループ管理";
     var nowLecture = ViewBag.NowLecture as Hogwarts.Models.Lecture;
     var myGroup = ViewBag.MyGroup as Hogwarts.Models.Group;
 }
-
-@Styles.Render("~/Content/jqueryui")
-@Styles.Render("~/Content/layout")
-@Scripts.Render("~/bundles/jqueryui")
-@Scripts.Render("~/bundles/layout")
 
 <style>
     .selected-hight {
@@ -20,50 +14,71 @@
         background-color: #0e90d2;
         color: #ffffff;
     }
+    .mdl-layout_group_header {
+        background-color: ghostwhite;
+        color: black;
+    }
+
+    .GroupCunsotmButton {
+        width: 60px;
+        height: 20px;
+        min-width: initial;
+        font-size: 8px;
+        line-height:20px;
+    }
 </style>
 
-<div id="layout" style="height:90vh;">
-    <div class="ui-layout-north">
-        現在講義：　@(nowLecture.LectureName)　　所属グループ：　@(myGroup.GroupName)
-    </div>
-    <div class="ui-layout-west">
-        @Html.ActionLink("グループ追加", "Edit", "Group", new { area = "" }, new { @class = "btn-ghost" })
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
+    <header class="mdl-layout__header mdl-layout_group_header">
+        <div class="mdl-layout__header-row">
+            現在講義：　@(nowLecture.LectureName)　
+            所属グループ：　@(myGroup.GroupName)
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">
+            グループ進捗管理
+        </span>
         <div id="divGroupList">
             @Html.Action("GroupListView")
         </div>
     </div>
-    <div class="ui-layout-center">
-        メンバー進捗
-        <input type="button" id="btnRefreshMemberProgress" class="btn-ghost RefreshGroupMemberProgress" value="更新"/>
-        <div id="divGroupMemberProgress">
-            @Html.Action("GroupMemberProgressView")
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            メンバー進捗
+            <input type="button" id="btnRefreshMemberProgress" class="mdl-button mdl-js-button GroupCunsotmButton mdl-button--raised mdl-button--colored RefreshGroupMemberProgress" value="更新" />
+            <div id="loading" class="mdl-spinner mdl-js-spinner"></div>
+            <div id="divGroupMemberProgress">
+                @Html.Action("GroupMemberProgressView")
+            </div>
         </div>
-    </div>
-    <div class="ui-layout-east">
-        グループ別進捗
-        <input type="button" id="btnRefreshGroupProgress" class="btn-ghost RefreshGroupProgress" value="更新" />
-        <div id="divGroupProgress">
-            @Html.Action("GroupProgressView")
-        </div>
-    </div>
-    @*<div class="ui-layout-south">South</div>*@
+    </main>
 </div>
+
+@*<div id="layout" style="height:90vh;">
+        <div class="ui-layout-east">
+            グループ別進捗
+            <input type="button" id="btnRefreshGroupProgress" class="btn-ghost RefreshGroupProgress" value="更新" />
+            <div id="divGroupProgress">
+                @Html.Action("GroupProgressView")
+            </div>
+        </div>
+    </div>*@
 
 <script type="text/javascript">
     $(function () {
-        $("#layout").layout();
 
         var selectedGroupId = @(myGroup.Id);
         if (selectedGroupId > 0) {
             $('#tr_group_' + selectedGroupId.toString()).addClass('selected-hight');
         }
 
-        $('#tblGroup tr').dblclick(function () {
+        $('#tblGroup tr').on('click', '.td_groupName', function () {
             var rows = $('table tbody tr');
             rows.removeClass('selected-hight');
-            $(this).addClass('selected-hight');
+            var id = $(this)[0].parentNode.id;
+            $('#' + id).addClass('selected-hight');
 
-            var id = $(this).attr('id');
             selectedGroupId = id.replace('tr_group_', '');
             ShowGroupmemberProgress(selectedGroupId);
         });
@@ -79,6 +94,9 @@
         });
 
         function ShowGroupmemberProgress(groupId) {
+            $('#loading').addClass('is-active');
+            $("#divGroupMemberProgress").empty();
+            $('#btnRefreshMemberProgress').prop("disabled", true);
             var ajaxData = { groupId: groupId};
             var url = '@Url.Action("GroupMemberProgressView", "Group")';
 
@@ -88,8 +106,9 @@
                 data: ajaxData,
                 dataType: "html"
             }).done(function (response, textStatus, jqXHR) {
-                $("#divGroupMemberProgress").empty();
                 $('#divGroupMemberProgress').append(response);
+                $('#loading').removeClass('is-active');
+                $('#btnRefreshMemberProgress').prop("disabled", false);
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 alert(errorThrown);
             }).always(function (jqXHR, textStatus) {

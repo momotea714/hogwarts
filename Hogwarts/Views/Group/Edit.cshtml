@@ -16,21 +16,28 @@
 
 <br>
 <div class="editGroup">
-    <label class="label">グループ名</label>
     @if (IsEdit == true)
     {
-        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" value="@(Model.GroupName)" style="max-width:100%" />
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" name="txtGroupName" id="txtGroupName" value="@(Model.GroupName)" style="max-width:100%">
+            <label class="mdl-textfield__label" for="txtGroupName">グループ名</label>
+        </div>
     }
     else
     {
-        <input type="text" id="txtGroupName" class="form-control col-md-12" placeholder="グループ名" style="max-width:100%" />
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" name="txtGroupName" id="txtGroupName" style="max-width:100%">
+            <label class="mdl-textfield__label" for="txtGroupName">グループ名</label>
+        </div>
     }
     <br>
-    <label class="label">グループメンバー</label>
     <div class="input-group">
-        <input type="text" class="form-control" id="txtUserID" placeholder="ユーザーID(社員番号)" style="max-width:100%">
-        <span class="input-group-btn">
-            <button id="btnAddMember" class="btn btn-default" type="button">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" name="txtUserID" id="txtUserID" style="max-width:100%">
+            <label class="mdl-textfield__label" for="txtUserID">ユーザーID(社員番号)</label>
+        </div>
+        <span class="input-group-btn" style="margin-top:5px;">
+            <button id="btnAddMember" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button">
                 <i class='glyphicon glyphicon-plus'>追加</i>
             </button>
         </span>
@@ -54,7 +61,7 @@
     <br>
     <br>
     <br>
-    <input type="button" id="btnRegist" class="btn btn-ghost" value="@(IsEdit == true ? "更新":"登録")" />
+    <input type="button" id="btnRegist" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" value="@(IsEdit == true ? "更新":"登録")" />
 
     <div>
         @Html.ActionLink("Back to List", "Index")

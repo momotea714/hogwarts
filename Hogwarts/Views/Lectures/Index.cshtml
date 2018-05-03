@@ -1,14 +1,20 @@
 ﻿@model IEnumerable<Hogwarts.Models.Lecture>
 
 @{
-    @Scripts.Render("~/bundles/bootstrap_select")
-    @Styles.Render("~/Content/bootstrap_select")
+    @*@Scripts.Render("~/bundles/bootstrap_select")*@
+    @*@Styles.Render("~/Content/bootstrap_select")*@
+    @Styles.Render("~/Content/star-rating")
+    @Styles.Render("~/Content/jqueryui")
+    @Styles.Render("~/Content/accordion")
+    @Scripts.Render("~/bundles/accordion")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/star-rating")
     ViewBag.Title = "進捗管理";
 }
 
-<h2>進捗管理</h2>
 
-<div id="divProgress">
+<div id="divProgress" style="margin-left:10px;">
+    <h5>進捗管理</h5>
     @if (User.IsInRole("Admin"))
     {
         @Html.Action("ProgressManage", "Lectures")

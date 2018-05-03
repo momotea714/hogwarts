@@ -15,13 +15,5 @@ namespace Hogwarts.Controllers
         {
             return View();
         }
-
-        public ActionResult Progress()
-        {
-            ViewBag.Lectures = db.Lectures.OrderBy(x => x.ShowOrder).ToList();
-            ViewBag.SubLectures = db.SubLectures.OrderBy(x => x.ShowOrder).ToList();
-            ViewBag.Questions = db.Questions.OrderBy(x => x.ShowOrder).ToList();
-            return View();
-        }
     }
 }

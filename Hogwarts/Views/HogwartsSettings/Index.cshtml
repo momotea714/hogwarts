@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<Hogwarts.Models.HogwartsSetting>
 
 @{
-    @Styles.Render("~/Content/bootstrap_select")
-    @Scripts.Render("~/bundles/bootstrap_select")
+
+    @Scripts.Render("~/bundles/bootstrap")
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.2/css/star-rating.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.2/js/star-rating.min.js"></script>
 
     var roles = ViewBag.Roles as IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>;
     var lecturesForSelectBox = ViewBag.LecturesForSelectBox as IEnumerable<Hogwarts.Models.Lecture>;
@@ -90,9 +92,13 @@
     <div id="show_dialog">
     </div>
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#LectureSetting">講義設定</a></li>
-        <li><a data-toggle="tab" href="#UserSetting">社員設定</a></li>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link" href="#LectureSetting" role="tab" data-toggle="tab">講義設定</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#UserSetting" role="tab" data-toggle="tab">社員設定</a>
+        </li>
     </ul>
 
     <div class="tab-content">

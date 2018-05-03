@@ -80,6 +80,19 @@ namespace Hogwarts.Models
         public DateTime UpdateDateTime { get; set; }
     }
 
+    public class ProgressManageViewModel
+    {
+        public int QuestionId { get; set; }
+        public string QuestionName { get; set; }
+        public int UnderStandingLevel { get; set; }
+        public double NotStartYet { get; set; }
+        public double InProcess { get; set; }
+        public double Completion { get; set; }
+        public int Progress { get; set; }
+        public string Remark { get; set; }
+
+    }
+
     public class AnswerStateAjaxParam
     {
         public int Id { get; set; }

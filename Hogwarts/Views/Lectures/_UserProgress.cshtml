@@ -24,28 +24,20 @@
     .ui-accordion-content {
         height: auto;
     }
-
-    /*#custom-handle {
-        width: 3em;
-        height: 1.6em;
-        margin-top: -.8em;
-        text-align: center;
-        line-height: 1.6em;
-    }*/
 </style>
 @foreach (var lecture in lectures)
 {
     <div class="accordion">
-        <h3>
+        <h5>
             @lecture.LectureName
-        </h3>
+        </h5>
         <div>
             @foreach (var subLecture in subLectures.Where(x => x.LectureId == lecture.Id))
             {
                 <div class="accordion">
-                    <h3>
+                    <h5>
                         @subLecture.SubLectureName
-                    </h3>
+                    </h5>
                     <div>
                         <table class="table table-hover table-striped">
                             <tr>

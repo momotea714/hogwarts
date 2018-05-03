@@ -1,67 +1,156 @@
 ﻿@{
     ViewBag.Title = "新人研修";
 }
+<style>
+    .demo-card-wide.mdl-card {
+        width: 700px;
+        min-height:150px;
+        margin-top:10px;
+        margin-left:10px;
+    }
 
-<div class="jumbotron">
-    <h1>Hogwarts</h1>
-    <p class="lead">
+    .demo-card-wide > .mdl-card__title {
+        color: #fff;
+        height: 50px;
+        padding-bottom:8px;
+    }
+
+    .demo-card-wide > .mdl-card__menu {
+        color: #fff;
+    }
+    .demo-card-wide > .mdl-card-action-index {
+        height: 30px;
+    }
+    .mdl-card__title {
+    padding-bottom:8px;
+    }
+    .mdl-card__supporting-text {
+        width: 98%;
+        padding-top: 8px;
+    }
+    .mdl-menu-card {
+        width: 98%;
+        min-height: 150px;
+        margin-top: 10px;
+        margin-left: 10px;
+    }
+</style>
+
+<div class="demo-card-wide mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text" style="color:black;">新人研修用サイト</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
         This site is for New training.
         Please use this site, taking advantage of the growth.
-    </p>
-    <p>
-        @if (!User.Identity.IsAuthenticated)
-        {
-            @Html.ActionLink("ログイン ≫", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "btn btn-ghost btn-white btn-lg" })
-        }
-    </p>
+    </div>
+    <div class="mdl-card__actions mdl-card--border mdl-card-action-index">
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="@Url.Action("Login","Account", routeValues: null)">
+            Login
+        </a>
+    </div>
 </div>
-
+<br>
 <div>
     <div class="row">
         <div class="col-md-4">
-            <h2><a href="@Url.Action("Index","Information")">お知らせ</a></h2>
-            <p>
-                講師やスタッフからのお知らせを見ることができます。<br>
-                新人から新人にお知らせすることもできます。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Information")">お知らせ</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    講師やスタッフからのお知らせを見ることができます。<br>
+                    新人から新人にお知らせすることもできます。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Information")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="col-md-4">
-            <h2><a href="@Url.Action("Index","Knowledge")">知識共有</a></h2>
-            <p>
-                学んだことをここで共有することができます。<br>
-                知識を集約していき、皆の学習に役立てます。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Knowledge")">知識共有</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    学んだことをここで共有することができます。<br>
+                    知識を集約していき、皆の学習に役立てます。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Knowledge")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="col-md-4">
-            <h2><a href="@Url.Action("Index","Asks")">質問</a></h2>
-            <p>
-                講師やスタッフに質問することができます。<br>
-                質問する前に一度ここで同じ質問がないか確認してみましょう。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Asks")">質問</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    講師やスタッフに質問することができます。<br>
+                    質問前に同じ質問がないか確認してみましょう。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Asks")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+    <br>
     <div class="row">
         <div class="col-md-4">
-            <h2><a href="@Url.Action("Index","Group")">グループ管理</a></h2>
-            <p>
-                グループを登録し、グループごとの進捗を管理します。
-                グループの評価は最終的に個人の評価に影響します。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Group")">グループ管理</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    グループを登録し、グループごとの進捗を管理します。
+                    グループの評価は最終的に個人の評価に影響します。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Group")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="col-md-4">
-            <h2><a href="@Url.Action("Index","Lectures")">進捗管理</a></h2>
-            <p>
-                演習問題の進捗管理をすることができます。<br>
-                自分の進捗のみを管理します。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Lectures")">進捗管理</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    演習問題の進捗管理をすることができます。<br>
+                    自分の進捗のみを管理します。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Lectures")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="col-md-4">
-
-            <h2><a href="@Url.Action("Index","Records")">ランキング</a></h2>
-            <p>
-                リアルタイムでランキングを表示します。<br>
-                各講義の最終日は新人は見ることができません。
-            </p>
+            <div class="mdl-card mdl-menu-card mdl-shadow--2dp">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"><a href="@Url.Action("Index","Records")">ランキング</a></h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    リアルタイムでランキングを表示します。<br>
+                    各講義の最終日は新人は見ることができません。
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="@Url.Action("Index","Records")">
+                        Get Started
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

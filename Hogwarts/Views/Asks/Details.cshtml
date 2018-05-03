@@ -1,16 +1,21 @@
 ﻿@model Hogwarts.Models.Ask
 
-@Scripts.Render("~/bundles/ckeditor/ckeditor")
-@Scripts.Render("~/bundles/ckeditor/adapters/ckeditoradapters")
-
 @{
     ViewBag.Title = "質問-詳細";
     var answers = ViewBag.Answers as IEnumerable<Hogwarts.Models.Ask>;
 }
+<style>
+    .askContainer {
+        height: 80vh;
+        overflow-y: auto;
+        margin-left: 10px;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-6">
-        <div style="height:80vh; overflow-y:auto;">
-            <h2>詳細</h2>
+        <div class="askContainer">
+            <h4>詳細</h4>
             <table>
                 <tr>
                     <td>
@@ -25,7 +30,7 @@
                     </td>
                 </tr>
             </table>
-            <h2>回答一覧</h2>
+            <h4>回答一覧</h4>
             <table>
                 @if (answers.Any())
                 {
@@ -72,38 +77,6 @@
 
 <script type="text/javascript">
     $(function () {
-        CKEDITOR.replace('sampleEditor',
-            {
-                toolbar: [
-                    { name: 'clipboard', groups: ['clipboard', 'undo'], items: [] },
-                    { name: 'editing', groups: ['find', 'selection', 'spellchecker'], items: ['Scayt'] },
-                    { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
-                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-                    { name: 'tools', items: ['Maximize'] },
-                    { name: 'document', groups: ['mode', 'document', 'doctools'], items: ['Source'] },
-                    { name: 'others', items: ['-'] },
-                    '/',
-                    { name: 'basicstyles', groups: ['basicstyles', 'cleanup'], items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-                    { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'], items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
-                    { name: 'styles', items: ['Styles', 'Format'] },
-                ],
-                toolbarGroups: [
-                    { name: 'clipboard', groups: ['clipboard', 'undo'] },
-                    { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
-                    { name: 'links' },
-                    { name: 'insert' },
-                    { name: 'forms' },
-                    { name: 'tools' },
-                    { name: 'document', groups: ['mode', 'document', 'doctools'] },
-                    { name: 'others' },
-                    '/',
-                    { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                    { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'] },
-                    { name: 'styles' },
-                    { name: 'colors' },
-                ],
-                uiColor: '#9AB8F3'
-            });
 
         $("#btnRegistAnswer").on('click', function (event) {
             RegistAnswer();
