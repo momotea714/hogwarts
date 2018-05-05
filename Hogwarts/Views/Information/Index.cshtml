@@ -7,17 +7,25 @@
 }
 <style>
     .scrollTable {
-        height: 78vh;
+        height: 87vh;
         overflow-y: auto;
+    }
+
+    .mdl-button--fab.mdl-button--mini-fab {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
     }
 </style>
 <div class="row">
     <div class="col-md-6">
-        <h4 style="margin-left:10px">
-            講師陣よりお知らせ　　　　　
+        <h4 style="margin:5px 0 0 10px">
+            お知らせ from 講師　or 人事　　　　　
             @if (User.IsInRole("Admin"))
             {
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" onclick="location.href='@Url.Action("Create","Information",null)';">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary"
+                        onclick="location.href='@Url.Action("Create","Information",null)';">
                     <i class="material-icons">add</i>
                 </button>
             }
@@ -28,15 +36,30 @@
                 {
                     <tr>
                         <td>
-                            <h3>
+                            <h5>
                                 @Html.DisplayFor(modelItem => item.Title)
-                            </h3>
+                            </h5>
                             <small>
                                 作成者：@Html.DisplayFor(modelItem => item.CreateUserName)
                                 作成日時：@Html.DisplayFor(modelItem => item.CreateDateTime)
                                 更新日時：@Html.DisplayFor(modelItem => item.UpdateDateTime)
-                                @Html.ActionLink("Edit", "Edit", new { id = item.Id })
-                                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                <button id="update_@(item.Id)"
+                                        onclick="location.href='@Url.Action("Edit","Information",new { id = item.Id})';"
+                                        class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">
+                                        feedback
+                                    </i>
+                                </button>
+                                <div class="mdl-tooltip" data-mdl-for="update_@(item.Id)">
+                                    修正
+                                </div>
+                                <button id="delete_@(item.Id)" class=" mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+                                        onclick="location.href='@Url.Action("Delete","Information", new { id = item.Id })';">
+                                    <i class="material-icons">delete</i>
+                                </button>
+                                <div class="mdl-tooltip" data-mdl-for="delete_@(item.Id)">
+                                    削除
+                                </div>
                             </small>
                             <p>
                                 @Html.Raw(item.Content)
@@ -48,11 +71,12 @@
         </div>
     </div>
     <div class="col-md-6">
-        <h4 style="margin-left:10px">
-            新人間のお知らせ　　　　　
+        <h4  style="margin:5px 0 0 10px">
+            お知らせ from 新人　　　　　
             @if (!User.IsInRole("Admin"))
             {
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" onclick="location.href='@Url.Action("Create","Information",null)';">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary"
+                        onclick="location.href='@Url.Action("Create","Information",null)';">
                     <i class="material-icons">add</i>
                 </button>
             }
@@ -63,15 +87,30 @@
                 {
                     <tr>
                         <td>
-                            <h3>
+                            <h5>
                                 @Html.DisplayFor(modelItem => item.Title)
-                            </h3>
+                            </h5>
                             <small>
                                 作成者：@Html.DisplayFor(modelItem => item.CreateUserName)
                                 作成日時：@Html.DisplayFor(modelItem => item.CreateDateTime)
                                 更新日時：@Html.DisplayFor(modelItem => item.UpdateDateTime)
-                                @Html.ActionLink("Edit", "Edit", new { id = item.Id })
-                                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                <button id="update_@(item.Id)"
+                                        onclick="location.href='@Url.Action("Edit","Information",new { id = item.Id})';"
+                                        class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">
+                                        feedback
+                                    </i>
+                                </button>
+                                <div class="mdl-tooltip" data-mdl-for="update_@(item.Id)">
+                                    修正
+                                </div>
+                                <button id="delete_@(item.Id)" class=" mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+                                        onclick="location.href='@Url.Action("Delete","Information", new { id = item.Id })';">
+                                    <i class="material-icons">delete</i>
+                                </button>
+                                <div class="mdl-tooltip" data-mdl-for="delete_@(item.Id)">
+                                    削除
+                                </div>
                             </small>
                             <p>
                                 @Html.DisplayFor(modelItem => item.Content)

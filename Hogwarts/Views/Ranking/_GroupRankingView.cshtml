@@ -1,0 +1,58 @@
+﻿@{
+    var groupPracticeRecords = ViewBag.GroupPracticeRecords as IEnumerable<Hogwarts.Models.GroupPracticeRecordViewModel>;
+    var groupPointRecords = ViewBag.GroupPointRecords as IEnumerable<Hogwarts.Models.GroupPointRecordViewModel>;
+}
+
+
+<div class="row" style="margin-left:10px;margin-right:10px;">
+    <div class="col-md-6">
+        <h5 style="margin-top:10px;">グループ別演習問題進捗ランキング</h5>
+        <table class="table" style="margin-top:0;margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th width="15%">順位</th>
+                    <th width="50%">グループ名</th>
+                    <th width="35%">進捗率</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="height:72vh;overflow-y:auto;">
+            <table class="table table-striped">
+                <tbody>
+                    @foreach (var groupPracticeRecord in groupPracticeRecords)
+                    {
+                    <tr>
+                        <td width="15%">@(groupPracticeRecord.Rank)</td>
+                        <td width="50%">@(groupPracticeRecord.GroupName)</td>
+                        <td width="35%">@(groupPracticeRecord.Progress) %</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h5 style="margin-top:10px;">グループ別ポイントランキング</h5>
+        <table class="table" style="margin-top:0;margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th width="15%">順位</th>
+                    <th width="50%">グループ名</th>
+                    <th width="35%">ポイント</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="height:72vh;overflow-y:auto;">
+            <table class="table table-striped">
+                @foreach (var groupPointRecord in groupPointRecords)
+                {
+                <tr>
+                    <td width="15%">@(groupPointRecord.Rank)</td>
+                    <td width="50%">@(groupPointRecord.GroupName)</td>
+                    <td width="35%">@(groupPointRecord.Point) 点</td>
+                </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>

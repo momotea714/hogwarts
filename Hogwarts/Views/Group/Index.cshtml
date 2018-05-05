@@ -19,7 +19,7 @@
         color: black;
     }
 
-    .GroupCunsotmButton {
+    .GroupCustomButton {
         width: 60px;
         height: 20px;
         min-width: initial;
@@ -46,7 +46,7 @@
     <main class="mdl-layout__content">
         <div class="page-content">
             メンバー進捗
-            <input type="button" id="btnRefreshMemberProgress" class="mdl-button mdl-js-button GroupCunsotmButton mdl-button--raised mdl-button--colored RefreshGroupMemberProgress" value="更新" />
+            <input type="button" id="btnRefreshMemberProgress" class="mdl-button mdl-js-button GroupCustomButton mdl-button--raised mdl-button--colored RefreshGroupMemberProgress" value="更新" />
             <div id="loading" class="mdl-spinner mdl-js-spinner"></div>
             <div id="divGroupMemberProgress">
                 @Html.Action("GroupMemberProgressView")
@@ -54,16 +54,6 @@
         </div>
     </main>
 </div>
-
-@*<div id="layout" style="height:90vh;">
-        <div class="ui-layout-east">
-            グループ別進捗
-            <input type="button" id="btnRefreshGroupProgress" class="btn-ghost RefreshGroupProgress" value="更新" />
-            <div id="divGroupProgress">
-                @Html.Action("GroupProgressView")
-            </div>
-        </div>
-    </div>*@
 
 <script type="text/javascript">
     $(function () {
@@ -89,10 +79,6 @@
             }
         });
 
-        $("#btnRefreshGroupProgress").on('click', function (event) {
-            ShowGroupProgress();
-        });
-
         function ShowGroupmemberProgress(groupId) {
             $('#loading').addClass('is-active');
             $("#divGroupMemberProgress").empty();
@@ -114,22 +100,6 @@
             }).always(function (jqXHR, textStatus) {
             });
         };
-
-        function ShowGroupProgress() {
-            var url = '@Url.Action("GroupProgressView", "Group")';
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                dataType: "html"
-            }).done(function (response, textStatus, jqXHR) {
-                $("#divGroupProgress").empty();
-                $('#divGroupProgress').append(response);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                alert(errorThrown);
-            }).always(function (jqXHR, textStatus) {
-            });
-        }
     });
 </script>
 

@@ -29,16 +29,10 @@ namespace Hogwarts.Models
         public string UserId { get; set; }
     }
 
-    public class GroupProgressViewModel
-    {
-        public int GroupId { get; set; }
-        public string GroupName { get; set; }
-        public int GroupProgressSum { get; set; }
-    }
-
     public class GroupViewModel
     {
         public int GroupId { get; set; }
+        public string GroupName { get; set; }
         public int GroupMemberCount { get; set; }
     }
 }

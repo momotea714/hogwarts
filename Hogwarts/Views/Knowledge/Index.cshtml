@@ -19,6 +19,11 @@
         min-height: 10px;
     }
 
+    .mdl-layout_group_header {
+        background-color: ghostwhite;
+        color: black;
+    }
+
     .Title {
         overflow: hidden;
         padding: 0px;
@@ -30,8 +35,8 @@
     }
 
     /*.modal-backdrop {
-        z-index: -1;
-    }*/
+            z-index: -1;
+        }*/
 
     .knowledge-card-wide {
         margin-left: 10px;
@@ -61,17 +66,44 @@
         border: 1px solid #666666;
     }
 
+    .extrawide {
+        width: 500px;
+    }
+
+    input, select, textarea {
+        max-width: 500px;
+    }
 </style>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-knowledge-layout">
+    <header class="mdl-layout__header mdl-layout_group_header">
+        <div class="mdl-layout__header-row">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text" style="color:black;">表示カテゴリー:　@(displayCategory.CategoryName)</h2>
+            </div>
+            <div class="mdl-card__menu">
+                <button id="btnAddKnowledge" onclick="location.href='@Url.Action("Create","Knowledge")';"
+                        class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary"
+                        style="position:absolute;right: 20px;top:5px;">
+                    <i class="material-icons">add</i>
+                    <span class="mdl-tooltip mdl-tooltip--left" for="btnAddKnowledge">知識追加</span>
+                </button>
+            </div>
+        </div>
+    </header>
     <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">
             カテゴリー
-            <button id="btnShowKnowledgeCategoryModal" data-toggle="modal" data-target="#modalCreateKnowledgeCategory" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary pull-right" style="margin:30px 0 0 40px">
+            <button id="btnShowKnowledgeCategoryModal" data-toggle="modal" data-target="#modalCreateKnowledgeCategory"
+                    class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary pull-right"
+                    style="margin:5px 0 0 40px">
                 <i class="material-icons">add</i>
             </button>
             <span class="mdl-tooltip mdl-tooltip--left" for="btnShowKnowledgeCategoryModal">カテゴリ追加</span>
         </span>
         <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="@Url.Action("Index", "Knowledge")">
+                全件
+            </a>
             @foreach (var knowledgeCategory in knowledgeCategories)
             {
                 <a class="mdl-navigation__link" href="@Url.Action("Index", "Knowledge",new { knowledgeCategoryId = knowledgeCategory.Id})">
@@ -82,19 +114,7 @@
     </div>
     <main class="mdl-layout__content">
         <div class="page-content">
-            <div class="knowledgeTitle-card-wide mdl-card mdl-shadow--2dp">
-                <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text" style="color:black;">表示カテゴリー:　@(displayCategory.CategoryName)</h2>
-                </div>
-                <div class="mdl-card__menu">
-                    <button id="btnAddKnowledge" onclick="location.href='@Url.Action("Create","Knowledge")';" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary" style="position:absolute;right: 20px;top:0px;">
-                        <i class="material-icons">add</i>
-                        <span class="mdl-tooltip mdl-tooltip--left" for="btnAddKnowledge">知識追加</span>
-                    </button>
-                </div>
-            </div>
-            <br>
-            <div style="height:75vh;overflow-y:auto;">
+            <div style="height:82vh;overflow-y:auto;">
                 @foreach (var knowledge in knowledgeViewModels)
                 {
                     <div class="knowledge-card-wide mdl-card mdl-shadow--2dp">
@@ -104,8 +124,8 @@
                         <div class="mdl-card__supporting-text" style="color:black;">
                             @Html.Raw(knowledge.Content)
                             <p style="font-size:12px;margin:0;color:slategray;">
-                                更新ユーザーID：@(knowledge.CreateUserId)　
-                                更新ユーザー名：@(knowledge.UserName)　
+                                更新ユーザーID：@(knowledge.CreateUserId)
+                                更新ユーザー名：@(knowledge.UserName)
                                 追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", knowledge.CreateDateTime))
                                 更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", knowledge.UpdateDateTime))
                             </p>
@@ -120,7 +140,7 @@
                             <div class="mdl-tooltip" data-mdl-for="detail_@(knowledge.Id)">
                                 詳細
                             </div>
-                            <button id="update_@(knowledge.Id)" onclick="location.href='@Url.Action("Edit","Knowledge",new { id = knowledge.Id})';"  data-knowledgeid="@(knowledge.Id)" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                            <button id="update_@(knowledge.Id)" onclick="location.href='@Url.Action("Edit","Knowledge",new { id = knowledge.Id})';" data-knowledgeid="@(knowledge.Id)" class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
                                 <i class="material-icons">
                                     feedback
                                 </i>
@@ -152,7 +172,7 @@
             </div>
             <!-- Modal body -->
             <div class="modal-body">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label extrawide">
                     <input class="mdl-textfield__input" type="text" name="KnowledgeCategory" id="txtKnowledgeCategory">
                     <label class="mdl-textfield__label" for="textbox2">カテゴリ名</label>
                 </div>

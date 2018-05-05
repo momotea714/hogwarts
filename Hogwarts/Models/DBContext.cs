@@ -39,7 +39,9 @@ namespace Hogwarts.Models
 
         public DbSet<Knowledge> Knowledges { get; set; }
 
-        public DbSet<Record> Records { get; set; }
+        public DbSet<UserRecord> UserRecords { get; set; }
+
+        public DbSet<GroupRecord> GroupRecords { get; set; }
 
         public DbSet<Ask> Asks { get; set; }
 

@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "ポイント付与";
+    var userPointRecords = ViewBag.UserPointRecords as IEnumerable<Hogwarts.Models.UserPointRecordViewModel>;
+    var groupPointRecords = ViewBag.GroupPointRecords as IEnumerable<Hogwarts.Models.GroupPointRecordViewModel>;
+}
+<style>
+    .mdl-button--fab.mdl-button--mini-fab {
+        height: 25px;
+        min-width: 25px;
+        width: 25px;
+    }
+</style>
+
+<div class="row" style="margin-left:10px;margin-right:10px;">
+    <div class="col-md-6">
+        <h5 style="margin-top:10px;">個人別ポイント</h5>
+        <table class="table" style="margin-top:0;margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th width="15%">ID</th>
+                    <th width="35%">氏名</th>
+                    <th width="20%">ポイント</th>
+                    <th width="30%">付与</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="height:72vh;overflow-y:auto;">
+            <table class="table table-striped">
+                @foreach (var userPointRecord in userPointRecords)
+                {
+                    <tr>
+                        <td width="15%">@(userPointRecord.UserLoginId)</td>
+                        <td width="35%">@(userPointRecord.UserName)</td>
+                        <td width="20%" id="user_point_@(userPointRecord.UserId)">@(userPointRecord.Point) 点</td>
+                        <td width="30%" style="padding-bottom:5px;padding-top:5px">
+                            <button id="btnPlus1Point_@(userPointRecord.UserId)"
+                                    class="update_btn plus_btn_user mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="1"
+                                    data-update_value="1"
+                                    data-update_id="@(userPointRecord.UserId)">
+                                <i class="material-icons" style="font-size: 18px;">star_half</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnPlus1Point_@(userPointRecord.UserId)">1ポイント追加</span>
+                            </button>
+                            <button id="btnPlus5Point_@(userPointRecord.UserId)"
+                                    class="update_btn plus_btn_user mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="1"
+                                    data-update_value="5"
+                                    data-update_id="@(userPointRecord.UserId)">
+                                <i class="material-icons" style="font-size: 18px;">star</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnPlus5Point_@(userPointRecord.UserId)">5ポイント追加</span>
+                            </button>
+                            <button id="btnMinusPoint_@(userPointRecord.UserId)"
+                                    class="update_btn minus_btn_user mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="1"
+                                    data-update_value="-1"
+                                    data-update_id="@(userPointRecord.UserId)">
+                                <i class="material-icons" style="font-size: 18px;">thumb_down</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnMinusPoint_@(userPointRecord.UserId)">1ポイントマイナス</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h5 style="margin-top:10px;">グループ別ポイント</h5>
+        <table class="table" style="margin-top:0;margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th width="15%">ID</th>
+                    <th width="35%">グループ名</th>
+                    <th width="20%">ポイント</th>
+                    <th width="30%">付与</th>
+                </tr>
+            </thead>
+        </table>
+        <div style="height:72vh;overflow-y:auto;">
+            <table class="table table-striped">
+                @foreach (var groupPointRecord in groupPointRecords)
+                {
+                    <tr>
+                        <td width="15%">@(groupPointRecord.GroupId)</td>
+                        <td width="35%">@(groupPointRecord.GroupName)</td>
+                        <td width="20%" id="group_point_@(groupPointRecord.GroupId)">@(groupPointRecord.Point) 点</td>
+                        <td width="30%" style="padding-bottom:5px;padding-top:5px">
+                            <button id="btnPlus1Point_@(groupPointRecord.GroupId)"
+                                    class="update_btn plus_btn_group mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="2"
+                                    data-update_value="1"
+                                    data-update_id="@(groupPointRecord.GroupId)">
+                                <i class="material-icons" style="font-size: 18px;">star_half</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnPlus1Point_@(groupPointRecord.GroupId)">1ポイント追加</span>
+                            </button>
+                            <button id="btnPlus5Point_@(groupPointRecord.GroupId)"
+                                    class="update_btn plus_btn_group mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="2"
+                                    data-update_value="5"
+                                    data-update_id="@(groupPointRecord.GroupId)">
+                                <i class="material-icons" style="font-size: 18px;">star</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnPlus5Point_@(groupPointRecord.GroupId)">5ポイント追加</span>
+                            </button>
+                            <button id="btnMinusPoint_@(groupPointRecord.GroupId)"
+                                    class="update_btn minus_btn_group mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab"
+                                    data-update_category="2"
+                                    data-update_value="-1"
+                                    data-update_id="@(groupPointRecord.GroupId)">
+                                <i class="material-icons" style="font-size: 18px;">thumb_down</i>
+                                <span class="mdl-tooltip mdl-tooltip--left" for="btnMinusPoint_@(groupPointRecord.GroupId)">1ポイントマイナス</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('.update_btn').on('click', function () {
+
+            var updateCategory = $(this).data('update_category');
+            var ajaxData =
+                {
+                    UpdateCategory: updateCategory,
+                    Point: $(this).data('update_value')
+                };
+
+            if (updateCategory == 1) {
+                ajaxData.UserId = $(this).data('update_id');
+            }
+            else {
+                ajaxData.GroupId = $(this).data('update_id');;
+            }
+            var url = '@Url.Action("Update", "Point")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.Result) {
+                    if (response.ResultData.UpdateCategory == 1) {
+                        $('#user_point_' + response.ResultData.UserId).text(response.ResultData.Point + "点");
+                    }
+                    else {
+                        $('#group_point_' + response.ResultData.GroupId).text(response.ResultData.Point + "点");
+                    }
+                }
+                else {
+                    alert(response.Message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
+        });
+    });
+</script>

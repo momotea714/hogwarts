@@ -44,6 +44,8 @@ namespace Hogwarts
             bundles.Add(new ScriptBundle("~/bundles/star-rating").Include(
                       "~/Scripts/star-rating.min.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/tbodyscroll").Include(
+                      "~/Scripts/jquery.tbodyscroll.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/ckeditor/adapters/ckeditoradapters").Include(
                       "~/Scripts/ckeditor/adapters/jquery.js"));

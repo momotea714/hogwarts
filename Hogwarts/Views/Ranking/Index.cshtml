@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "ランキング";
+}
+
+<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+    <div class="mdl-tabs__tab-bar">
+        <a href="#User" class="mdl-tabs__tab is-active">User</a>
+        <a href="#Group" class="mdl-tabs__tab">Group</a>
+    </div>
+
+    <div class="mdl-tabs__panel is-active" id="User">
+        @Html.Action("UserRanking", "Ranking")
+
+    </div>
+    <div class="mdl-tabs__panel is-active" id="Group">
+        @Html.Action("GroupRanking", "Ranking")
+    </div>
+</div>
+

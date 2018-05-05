@@ -149,63 +149,6 @@ namespace Hogwarts.Controllers
             return PartialView("_GroupMemberProgressView");
         }
 
-        public ActionResult GroupProgressView()
-        {
-            var nowLecture = HogwartsSettingUtility.GetNowLecture();
-            ViewBag.QuestionCount = db.Questions.Join(
-                                            db.SubLectures,
-                                            q => q.SubLectureId,
-                                            s => s.Id,
-                                            (q,s) => new { q, s})
-                                        .Where(x => x.s.LectureId == nowLecture.Id)
-                                        .Count();
-
-            ViewBag.Groups = db.Groups.Join(
-                                        db.GroupMembers,
-                                        g => g.Id,
-                                        gm => gm.GroupId,
-                                        (g, gm) => new { g, gm }
-                                        )
-                                  .Where(x => x.g.LectureId == nowLecture.Id)
-                                  .GroupBy(x => x.gm.GroupId)
-                                  .Select(x => new GroupViewModel
-                                  {
-                                      GroupId = x.Key,
-                                      GroupMemberCount = x.Count()
-                                  })
-                                  .ToList();
-
-            ViewBag.GroupProgress = db.Groups.Join(
-                                      db.GroupMembers,
-                                      g => g.Id,
-                                      gm => gm.GroupId,
-                                      (Group,GroupMember) => new { Group, GroupMember })
-                                  .Join(
-                                      db.UserAnswerStates,
-                                      x => x.GroupMember.UserId,
-                                      u => u.UserId,
-                                      (Group, UserAnswerState) => new { Group, UserAnswerState })
-                                  .Join(db.Questions,
-                                      x => x.UserAnswerState.QuestionId,
-                                      q => q.Id,
-                                  (Group, Questions) => new { Group, Questions })
-                                  .Join(db.SubLectures,
-                                      x => x.Questions.SubLectureId,
-                                      s => s.Id,
-                                      (Group,SubLecture) => new { Group,SubLecture })
-                                  .Where(x => x.SubLecture.LectureId == nowLecture.Id)
-                                  .GroupBy(x => x.Group.Group.Group.Group.Id)
-                                  .Select(x => new GroupProgressViewModel
-                                  {
-                                      GroupId = x.Key,
-                                      GroupName = x.Max(y => y.Group.Group.Group.Group.GroupName),
-                                      GroupProgressSum = x.Sum(y => y.Group.Group.UserAnswerState.Progress)
-                                  })
-                                  .ToList();
-
-            return PartialView("_GroupProgressView");
-        }
-
         public ActionResult MemberView(string userId)
         {
             return PartialView("_MemberView", db.Users.Find(userId));

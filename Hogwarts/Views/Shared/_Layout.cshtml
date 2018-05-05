@@ -18,8 +18,8 @@
 </head>
 <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-        <header class="mdl-layout__header">
-            <div class="mdl-layout__header-row">
+        <header class="mdl-layout__header" style="min-height: 50px;height: 50px;">
+            <div class="mdl-layout__header-row" style="min-height: 50px;height: 50px;">
                 <!-- Title -->
                 <a href="@Url.Action("Index","Home")" style="color:white;">
                     <span class="mdl-layout-title">
@@ -32,6 +32,7 @@
                 <nav class="mdl-navigation mdl-layout--large-screen-only">
                     @if (User.IsInRole("Admin"))
                     {
+                        @Html.ActionLink("Point", "Index", "Point", null, new { @class = "mdl-navigation__link" })
                         @Html.ActionLink("Setting", "Index", "HogwartsSettings", null, new { @class = "mdl-navigation__link" })
                     }
                 </nav>
@@ -41,11 +42,6 @@
         <main class="mdl-layout__content">
             @RenderBody()
         </main>
-        @*<div class="container body-content">
-                <footer>
-                    <p>&copy; @DateTime.Now.Year - Hogwarts</p>
-                </footer>
-            </div>*@
     </div>
     @RenderSection("scripts", required: false)
     <script type="text/javascript">
