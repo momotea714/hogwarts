@@ -36,7 +36,7 @@ namespace Hogwarts.Controllers
             }
             else
             {
-                group = db.Groups.Where(x => x.Id == belongGroup.Id).FirstOrDefault();
+                group = db.Groups.Where(x => x.Id == belongGroup.GroupId).FirstOrDefault();
             }
             ViewBag.MyGroup = group;
             ViewBag.NowLecture = HogwartsSettingUtility.GetNowLecture();

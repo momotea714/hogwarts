@@ -40,10 +40,11 @@ namespace Hogwarts.Controllers
                 if (users.TryGetValue(x.CreateUserId, out user))
                 {
                     existUser = true;
-                    if (user.UserID == User.Identity.Name)
-                    {
-                        isMyAsk = true;
-                    }
+                }
+
+                if ((existUser && user.UserID == User.Identity.Name) || User.IsInRole("Admin"))
+                {
+                    isMyAsk = true;
                 }
                 return new AskViewModel
                 {
@@ -75,8 +76,61 @@ namespace Hogwarts.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.Answers = db.Asks.Where(x => x.ParentAskId == ask.Id).ToList();
-            return View(ask);
+            var answer = db.Asks.Where(x => x.ParentAskId == ask.Id).ToList();
+            var users = UserUtility.GetUserListInNowDisplayGroup().ToDictionary(u => u.Id);
+            ApplicationUser user;
+            var existUser = false;
+            var isMyAsk = false;
+            if (users.TryGetValue(ask.CreateUserId, out user))
+            {
+                existUser = true;
+            }
+
+            if ((existUser && user.UserID == User.Identity.Name) || User.IsInRole("Admin"))
+            {
+                isMyAsk = true;
+            }
+            var askViewModel = new AskViewModel
+            {
+                Id = ask.Id,
+                ParentAskId = ask.ParentAskId,
+                Content = ask.Content,
+                CreateDateTime = ask.CreateDateTime,
+                UpdateDateTime = ask.UpdateDateTime,
+                IsClosed = ask.IsClosed,
+                Role = ask.Role,
+                AnswerCount = answer.Count(y => y.ParentAskId == ask.Id),
+                CreateUserId = existUser ? user.UserID : "manager",
+                CreateUserName = existUser ? user.UserName : "講師陣",
+                IsMyAsk = isMyAsk
+            };
+
+            ViewBag.Answers = answer.Select(x =>
+            {
+                var isExist = false;
+                if (users.TryGetValue(ask.CreateUserId, out user))
+                {
+                    isExist = true;
+                }
+
+                if ((existUser && user.UserID == User.Identity.Name) || User.IsInRole("Admin"))
+                {
+                    isMyAsk = true;
+                }
+                return new AskViewModel
+                {
+                    Id = x.Id,
+                    Content = x.Content,
+                    CreateDateTime = x.CreateDateTime,
+                    UpdateDateTime = x.UpdateDateTime,
+                    Role = x.Role,
+                    CreateUserId = isExist ? user.UserID : "manager",
+                    CreateUserName = isExist ? user.UserName : "講師陣",
+                    IsMyAsk = isMyAsk
+                };
+            });
+
+            return View(askViewModel);
         }
 
         // GET: Asks/Create
@@ -195,6 +249,7 @@ namespace Hogwarts.Controllers
                     answer.UpdateDateTime = DateTime.Now;
                     answer.CreateUserId = user.Id;
                     db.Asks.Add(answer);
+                    ask.UpdateDateTime = DateTime.Now;
                     db.SaveChanges();
                 }
                 else
@@ -210,6 +265,29 @@ namespace Hogwarts.Controllers
             return Json(new { result = "Redirect", url = Url.Action("Index", "Asks") });
         }
 
+        public JsonResult CloseAsk(Ask ask)
+        {
+            try
+            {
+                var originalAsk = db.Asks.Where(x => x.Id == ask.Id).FirstOrDefault();
+                if (ask != null)
+                {
+                    originalAsk.IsClosed = true;
+                    originalAsk.UpdateDateTime = DateTime.Now;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    return Json(new { result = "Error", message = "該当する質問は存在しません" });
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return Json(new { result = "Redirect", url = Url.Action("Index", "Asks") });
+        }
         #endregion
 
     }

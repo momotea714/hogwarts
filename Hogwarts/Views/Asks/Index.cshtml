@@ -7,84 +7,141 @@
     .Title {
         overflow: hidden;
         padding: 0px;
-        width: 80vh;
+        width: 78vh;
         line-height: 1.0;
         white-space: nowrap;
         text-overflow: ellipsis;
         -o-text-overflow: ellipsis; /* Opera */
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .notBottomMargin {
+        margin-bottom: 1px;
+    }
+
+    .mdl-button--fab.mdl-button--mini-fab {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+    }
+
+    .ask-card-wide {
+        margin-left: 10px;
+        width: 97%;
+        min-height: 10px;
+        margin-top: 4px;
+        margin-bottom: 5px;
+        padding-bottom: 0px;
+        padding-top: 5px;
     }
 </style>
 
-<br>
-<p>
-    @Html.ActionLink("質問を追加", "Create", "Asks", new { @class = "btn btn-ghost" })
-</p>
 <div class="row">
     <div class="col-md-6">
-        <label>回答受付中の質問</label>
-        <div style="height:75vh; overflow-y:auto;">
-            <table class="table">
-                @foreach (var item in Model.Where(x => !x.IsClosed))
-                {
-                    <tr>
-                        <td>
-                            <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
-                                <p class="Title">
-                                    @Html.DisplayFor(modelItem => item.Content)
-                                </p>
-                            </a>
-                            <p style="font-size:12px;">
-                                作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
-                                作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
-                                回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
-                            </p>
-                            @*@Html.DisplayFor(modelItem => item.ParentAskId)*@
-                            @*@Html.DisplayFor(modelItem => item.IsClosed)*@
-                            <p style="font-size:12px;">
-                                追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
-                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
-                                @if (item.IsMyAsk && item.AnswerCount == 0)
-                                {
-                                    <span>　</span>
-                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
-                                    <span>　</span>
-                                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                                }
-                            </p>
-                        </td>
-                    </tr>
-                }
-            </table>
+        <h4 style="margin:5px 0 0 20px">
+            回答受付中の質問
+            <button id="AddAsk" class="pull-right mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--primary"
+                    onclick="location.href='@Url.Action("Create","Asks",null)';">
+                <i class="material-icons">add</i>
+            </button>
+        </h4>
+        <div class="mdl-tooltip" data-mdl-for="AddAsk">
+            質問を追加
+        </div>
+        <div style="height:85vh; overflow-y:auto;">
+            @foreach (var item in Model.Where(x => !x.IsClosed))
+            {
+                <div class="mdl-card mdl-menu-card mdl-shadow--8dp ask-card-wide">
+                    <div class="mdl-card__supporting-text ask-card-wide">
+                        <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
+                            <h5 class="Title">
+                                @Html.DisplayFor(modelItem => item.Content)
+                            </h5>
+                        </a>
+                        <p class="notBottomMargin" style="font-size:12px;">
+                            作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
+                            作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
+                            回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
+                        </p>
+                        <p class="notBottomMargin" style="font-size:12px;">
+                            作成日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
+                            更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
+                        </p>
+                    </div>
+                    <div class="mdl-card__menu" style="position:absolute;top:50px;">
+                        @if (item.IsMyAsk && item.AnswerCount == 0)
+                        {
+                            <button onclick="location.href='@Url.Action("Edit","Asks",new { id = item.Id})';"
+                                    class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">
+                                    feedback
+                                </i>
+                            </button>
+                            <div class="mdl-tooltip">
+                                修正
+                            </div>
+                            <button onclick="location.href='@Url.Action("Delete","Asks",new { id = item.Id})';"
+                                    class="DeleteKnowledge mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">delete</i>
+                            </button>
+                            <div class="mdl-tooltip">
+                                削除
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
-    <div class="col-md-6">
-        <label>解決済みの質問</label>
-        <div style="height:75vh; overflow-y:auto;">
-            <table class="table">
-                @foreach (var item in Model.Where(x => x.IsClosed))
-                {
-                    <tr>
-                        <td>
-                            <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
-                                <p class="Title">
-                                    @Html.DisplayFor(modelItem => item.Content)
-                                </p>
-                            </a>
-                            <p style="font-size:12px;">
-                                作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
-                                作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
-                                回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
-                            </p>
-                            @*@Html.DisplayFor(modelItem => item.ParentAskId)*@
-                            @*@Html.DisplayFor(modelItem => item.IsClosed)*@
-                            <p style="font-size:12px;">
-                                追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
-                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
-                            </p>
-                        </td>
-                    </tr>
-                }
-            </table>
+    <div class="col-md-6" style="padding-left:0px;">
+        <h4 style="margin:5px 0 0 10px">
+            解決済みの質問　　　　
+        </h4>
+        <div style="height:85vh; overflow-y:auto;">
+            @foreach (var item in Model.Where(x => x.IsClosed))
+            {
+                <div class="mdl-card mdl-menu-card mdl-shadow--8dp ask-card-wide">
+                    <div class="mdl-card__supporting-text ask-card-wide">
+                        <a href="@Url.Action("Details", "Asks", new { id = item.Id })" style="font-size:20px;">
+                            <h5 class="Title">
+                                @Html.DisplayFor(modelItem => item.Content)
+                            </h5>
+                        </a>
+                        <p class="notBottomMargin" style="font-size:12px;">
+                            作成者ID：@Html.DisplayFor(modelItem => item.CreateUserId)
+                            作成者名：@Html.DisplayFor(modelItem => item.CreateUserName)
+                            回答数：@Html.DisplayFor(modelItem => item.AnswerCount)
+                        </p>
+                        <p class="notBottomMargin" style="font-size:12px;">
+                            作成日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.CreateDateTime))
+                            更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", item.UpdateDateTime))
+                        </p>
+                    </div>
+                    <div class="mdl-card__menu" style="position:absolute;top:50px;">
+                        @if (item.IsMyAsk && item.AnswerCount == 0)
+                        {
+                            <button onclick="location.href='@Url.Action("Edit","Asks",new { id = item.Id})';"
+                                    class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">
+                                    feedback
+                                </i>
+                            </button>
+                            <div class="mdl-tooltip">
+                                修正
+                            </div>
+                            <button onclick="location.href='@Url.Action("Delete","Asks",new { id = item.Id})';"
+                                    class="DeleteKnowledge mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                <i class="material-icons">delete</i>
+                            </button>
+                            <div class="mdl-tooltip">
+                                削除
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>

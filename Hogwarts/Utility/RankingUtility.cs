@@ -82,13 +82,34 @@ namespace Hogwarts.Utility
             {
                 var userRecords = db.UserRecords.Where(x => x.LectureId == nowLectureId)
                                             .ToList();
-                var userNotInUserRecords = userInRole.Where(x => !userRecords.Any(y => y.UserId == x.Key)).ToDictionary(x => x.Key);
-                userRecords.AddRange(userNotInUserRecords.Select(x =>
-                                            new UserRecord
-                                            {
-                                                UserId = x.Key,
-                                                Point = 0,
-                                            }));
+                var targetTraineeOfLectures = db.TargetTraineeOfLectures
+                                                .Join(db.Lectures,
+                                                t => t.LectureId,
+                                                l => l.Id,
+                                                (t, l) => new { t, l })
+                                                .Where(x => x.l.Id == nowLectureId)
+                                                .ToList();
+                if (targetTraineeOfLectures.Any())
+                {
+                    var userNotInUserRecords = targetTraineeOfLectures.Where(x => !userRecords.Any(y => y.UserId == x.t.UserId)).ToDictionary(x => x.t.UserId);
+                    userRecords.AddRange(userNotInUserRecords.Select(x =>
+                                                new UserRecord
+                                                {
+                                                    UserId = x.Key,
+                                                    Point = 0,
+                                                }));
+                }
+                else
+                {
+                    var userNotInUserRecords = userInRole.Where(x => !userRecords.Any(y => y.UserId == x.Key)).ToDictionary(x => x.Key);
+                    userRecords.AddRange(userNotInUserRecords.Select(x =>
+                                                new UserRecord
+                                                {
+                                                    UserId = x.Key,
+                                                    Point = 0,
+                                                }));
+                }
+                
                 return userRecords.OrderByDescending(x => x.Point)
                                   .Select(x =>
                                          new UserPointRecordViewModel

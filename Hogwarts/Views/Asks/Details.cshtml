@@ -1,13 +1,26 @@
-﻿@model Hogwarts.Models.Ask
+﻿@model Hogwarts.Models.AskViewModel
 
 @{
     ViewBag.Title = "質問-詳細";
-    var answers = ViewBag.Answers as IEnumerable<Hogwarts.Models.Ask>;
+    var answers = ViewBag.Answers as IEnumerable<Hogwarts.Models.AskViewModel>;
 }
 <style>
     .askContainer {
-        height: 80vh;
+        margin-right: 20px;
+    }
+
+    .answerContainer {
+        height: 60vh;
         overflow-y: auto;
+    }
+
+    .ask-card-wide {
+        margin-left: 10px;
+        width: 100%;
+        min-height: 10px;
+    }
+
+    .LeftMargin {
         margin-left: 10px;
     }
 </style>
@@ -15,56 +28,88 @@
 <div class="row">
     <div class="col-md-6">
         <div class="askContainer">
-            <h4>詳細</h4>
-            <table>
-                <tr>
-                    <td>
-                        質問者：@Html.DisplayFor(model => model.CreateUserId)
-                        <p style="font-size:12px;">
-                            追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.CreateDateTime))
-                            更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.UpdateDateTime))
-                        </p>
-                        <div class="col-md-12" style="word-wrap: break-word;">
-                            @Html.Raw(Model.Content)
+            <h4 class="LeftMargin">詳細</h4>
+            <div class="mdl-card mdl-menu-card mdl-shadow--8dp ask-card-wide">
+                <div class="mdl-card__supporting-text ask-card-wide">
+                    質問者：@Html.DisplayFor(model => model.CreateUserName)
+                    <p style="font-size:12px;">
+                        作成日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.CreateDateTime))
+                        更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", Model.UpdateDateTime))
+                    </p>
+                    <div style="word-wrap: break-word;">
+                        @Html.Raw(Model.Content)
+                    </div>
+                </div>
+                @if (!Model.IsClosed)
+                {
+                    <div class="mdl-card__menu">
+                        <button id="detail_@(Model.Id)" data-toggle="modal" data-askid="@(Model.Id)" class="closeask mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                            <i class="material-icons">
+                                done_all
+                            </i>
+                        </button>
+                        <div class="mdl-tooltip" data-mdl-for="detail_@(Model.Id)">
+                            解決済みにする
                         </div>
-                    </td>
-                </tr>
-            </table>
-            <h4>回答一覧</h4>
-            <table>
-                @if (answers.Any())
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="answerContainer">
+            <h4 class="LeftMargin">回答一覧</h4>
+            @if (answers.Any())
+            {
+                foreach (var answer in answers)
                 {
-                    foreach (var answer in answers)
-                    {
-                        <tr>
-                            <td>
-                                回答者：@Html.DisplayFor(model => answer.CreateUserId)
-                                <p style="font-size:12px;">
-                                    追加日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.CreateDateTime))
-                                    更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.UpdateDateTime))
-                                </p>
-                                <div style="word-wrap: break-word;">
-                                    @Html.Raw(answer.Content)
+                    <div class="mdl-card mdl-menu-card mdl-shadow--2dp ask-card-wide">
+                        <div class="mdl-card__supporting-text ask-card-wide">
+                            回答者：@Html.DisplayFor(model => answer.CreateUserName)
+                            <p style="font-size:12px;">
+                                作成日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.CreateDateTime))
+                                更新日時：@(string.Format("{0:yyyy/MM/dd hh:mm}", answer.UpdateDateTime))
+                            </p>
+                            <div style="word-wrap: break-word;">
+                                @Html.Raw(answer.Content)
+                            </div>
+                        </div>
+                        <div class="mdl-card__menu" style="position:absolute;top:50px;">
+                            @if (answer.IsMyAsk)
+                            {
+                                <button onclick="location.href='@Url.Action("Edit","Asks",new { id = answer.Id})';"
+                                        class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">
+                                        feedback
+                                    </i>
+                                </button>
+                                <div class="mdl-tooltip">
+                                    修正
                                 </div>
-                            </td>
-                        </tr>
-                    }
+                                <button onclick="location.href='@Url.Action("Delete","Asks",new { id = answer.Id})';"
+                                        class="DeleteKnowledge mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                                    <i class="material-icons">delete</i>
+                                </button>
+                                <div class="mdl-tooltip">
+                                    削除
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <br>
                 }
-                else
-                {
-                    <tr>
-                        <td>
-                            回答はありません。
-                        </td>
-                    </tr>
-                }
-            </table>
+            }
+            else
+            {
+                @("回答はありません。")
+            }
         </div>
     </div>
     <div class="col-md-6">
         <p>
             <br>
-            <input type="button" id="btnRegistAnswer" class="btn btn-ghost col-md-offset-10" value="回答する" />
+            <input type="button" id="btnRegistAnswer"
+                   class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored col-md-offset-10"
+                   style="margin-left:20px;"
+                   value="回答する" />
         </p>
         <div class="col-md-12">
             @Html.TextArea("sampleEditor", new { @class = "ckeditor", @id = "sampleEditor" })
@@ -80,6 +125,33 @@
 
         $("#btnRegistAnswer").on('click', function (event) {
             RegistAnswer();
+        });
+
+        $(".closeask").on('click', function (event) {
+            var askId = $(this).data('askid');
+            var ajaxData =
+                {
+                    Id: askId,
+                };
+
+            var url = '@Url.Action("CloseAsk", "Asks")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: ajaxData,
+                dataType: "json"
+            }).done(function (response, textStatus, jqXHR) {
+                if (response.result == 'Redirect') {
+                    window.location = response.url;
+                }
+                else {
+                    alert(response.Message);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(errorThrown);
+            }).always(function (jqXHR, textStatus) {
+            });
         });
 
         function RegistAnswer() {

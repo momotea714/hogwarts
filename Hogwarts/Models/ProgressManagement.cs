@@ -170,7 +170,7 @@ namespace Hogwarts.Models
                         db.Entry(answerState).State = EntityState.Modified;
                     }
                     db.SaveChanges();
-                    ajaxResult.ResultData = answerState;
+                    ajaxResult.ResultData = ajaxParam;
                     ajaxResult.Result = true;
                 }
                 catch

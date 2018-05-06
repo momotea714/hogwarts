@@ -47,13 +47,13 @@
                                 <th width="20%">
                                     難易度
                                 </th>
-                                <th width="20%">
+                                <th width="25%">
                                     進捗
                                 </th>
-                                <th width="20%">
+                                <th width="25%">
                                     理解度
                                 </th>
-                                <th width="50%">
+                                <th width="40%">
                                     備考
                                 </th>
                             </tr>
@@ -74,20 +74,34 @@
                                         <td>
                                             <input type="text" class="rating" value="@question.Difficulty" data-size="xs" title="" data-readonly="true" data-show-clear="false" data-show-caption="false">
                                         </td>
-                                        <td>
-                                            <div id="sldProgress_question_@(question.Id.ToString())" class="slider_progress" data-value="@(answerState.Progress)">
-                                                <div class="ui-slider-handle"></div>
+                                        <td style="padding-bottom:0px;">
+                                            <div>
+                                                <div id="sldProgress_question_@(question.Id.ToString())" class="slider_progress" data-value="@(answerState.Progress)">
+                                                    <div class="ui-slider-handle"></div>
+                                                </div>
+                                                <label id="lblProgress_question_@(question.Id.ToString())">@(answerState.Progress)%</label>
                                             </div>
-                                            <label id="lblProgress_question_@(question.Id.ToString())">@(answerState.Progress)%</label>
+                                            <div>
+                                                <small style="position:relative;left:50px;bottom:25px;">
+                                                    <span id="spanUpdateProgress_question_@(question.Id.ToString())" class="pull-right"></span>
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td style="padding-bottom:0px;">
+                                            <div>
+                                                <div id="sldUnderStand_question_@(question.Id.ToString())" class="slider_understand" data-value="@(answerState.UnderStandingLevel)">
+                                                    <div class="ui-slider-handle"></div>
+                                                </div>
+                                                <label id="lblUnderStand_question_@(question.Id.ToString())">@(answerState.UnderStandingLevel)%</label>
+                                            </div>
+                                            <div>
+                                                <small style="position:relative;left:50px;bottom:25px;">
+                                                    <span id="spanUpdateUnderStand_question_@(question.Id.ToString())" class="pull-right"></span>
+                                                </small>
+                                            </div>
                                         </td>
                                         <td>
-                                            <div id="sldUnderStand_question_@(question.Id.ToString())" class="slider_understand" data-value="@(answerState.UnderStandingLevel)">
-                                                <div class="ui-slider-handle"></div>
-                                            </div>
-                                            <label id="lblUnderStand_question_@(question.Id.ToString())">@(answerState.UnderStandingLevel)%</label>
-                                        </td>
-                                        <td>
-                                            <textarea rows="2" cols="30"></textarea>
+                                            <textarea rows="2" cols="30">未実装です。</textarea>
                                         </td>
                                     </tr>
                                 }
@@ -154,10 +168,12 @@
                     if ($(this).hasClass('slider_progress')) {
                         id = this.id.replace('sldProgress_question_','');
                         updateKBN = 0;
+                        $('#spanUpdateProgress_question_' + id).text('更新中');
                     }
                     else {
                         id = this.id.replace('sldUnderStand_question_', '');
                         updateKBN = 1;
+                        $('#spanUpdateUnderStand_question_' + id).text('更新中');
                     }
 
                     var ajaxData = {
@@ -174,12 +190,19 @@
                         data: ajaxData,
                         dataType: "json"
                     }).done(function (response, textStatus, jqXHR) {
-                        //if (response.result == 'Redirect') {
-                        //    window.location = response.url;
-                        //}
-                        //else {
-                        //    alert('更新失敗F5してからもう一度お願いします');
-                        //}
+                        if (response.Result) {
+                            if (response.ResultData.UpdateKBN == 0) {
+                                $('#spanUpdateProgress_question_' + response.ResultData.Id)
+                                    .text(response.ResultData.Value + '%に更新しました');
+                            }
+                            else {
+                                $('#spanUpdateUnderStand_question_' + response.ResultData.Id)
+                                    .text(response.ResultData.Value + '%に更新しました');
+                            }
+                        }
+                        else {
+                            alert(response.Message);
+                        }
                     }).fail(function (jqXHR, textStatus, errorThrown) {
                         alert(errorThrown);
                     }).always(function (jqXHR, textStatus) {
